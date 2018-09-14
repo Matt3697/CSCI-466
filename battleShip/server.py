@@ -13,20 +13,19 @@ class requests():
     def on_POST():
         print("Success")
 
-def throw_argument_error()
+def throw_argument_error():
     print ("Error: incorrect arguments.")
 
-def handle_args()
+def handle_args():
     if(len(sys.argv) != 3)
         throw_argument_error()
-
 #def socket_handling()
     #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.bind((host, portNum))
     #serv_address = (host, portNum)
     #s.listen(1)
 
-def start_server()
+def start_server():
     httpd = HTTPServer(serv_address, handleRequests)
     httpd.serve_forever()
 
@@ -39,9 +38,9 @@ def start_server()
 #file.close()
 
 
-def main()
+def main():
     handle_args() #make sure arguments are valid
     start_server()
     conn.close()
     s.close()
-    print "End of script."
+    print ("End of script.")
