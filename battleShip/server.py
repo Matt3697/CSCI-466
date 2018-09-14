@@ -7,7 +7,7 @@ portNum  = sys.argv[1] #port number
 portNum  = int(portNum) #convert port number to an integer
 fileName = sys.argv[2] #file name for game board
 host     = socket.gethostname()
-
+arg_length = len(sys.argv)
 
 class requests():
     def on_POST():
@@ -17,7 +17,8 @@ def throw_argument_error():
     print ("Error: incorrect arguments.")
 
 def handle_args():
-    if(len(sys.argv) != 3)
+    print type(arg_length)
+    if arg_length != 3:
         throw_argument_error()
 #def socket_handling()
     #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
