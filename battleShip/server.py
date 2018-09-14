@@ -9,9 +9,9 @@ fileName = sys.argv[2] #file name for game board
 host     = socket.gethostname()
 
 
-class handleRequests():
+class requests():
     def on_POST():
-        print("made it")
+        print("Success")
 
 def throw_argument_error()
     print ("Error: incorrect arguments.")
@@ -20,11 +20,11 @@ def handle_args()
     if(len(sys.argv) != 3)
         throw_argument_error()
 
-def socket_handling()
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((host, portNum))
-    serv_address = (host, portNum)
-    s.listen(1)
+#def socket_handling()
+    #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #s.bind((host, portNum))
+    #serv_address = (host, portNum)
+    #s.listen(1)
 
 def start_server()
     httpd = HTTPServer(serv_address, handleRequests)
