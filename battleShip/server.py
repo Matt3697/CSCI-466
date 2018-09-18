@@ -7,9 +7,9 @@
 #
 
 import sys
-#import httplib
+#from httplib import httpconnection
 import socket
-from http.server import HTTPServer
+#from http.server import HTTPServer
 
 arg_length = len(sys.argv)
 
@@ -18,8 +18,8 @@ class requests():
         print("Success")
 
 def throw_argument_error():
-    print ("Error: incorrect arguments.")
-    sys.exit(1)
+    print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name>")
+    sys.exit(0)
 
 def handle_args():
     if (arg_length != 3):
@@ -41,3 +41,5 @@ def main():
     #conn.close()
     #s.close()
     print ("End of script.")
+
+main()
