@@ -7,10 +7,8 @@
 #
 
 import sys
-import http.client
-import urllib.request
-#from http.server import HTTPServer
-
+from http.server import HTTPServer
+from http.server import BaseHTTPRequestHandler
 arg_length = len(sys.argv)
 portNum    = 0
 
@@ -27,22 +25,12 @@ def handle_args():
         portNum    = int(portNum) #convert port number to an integer
         fileName   = sys.argv[2]  #file name for game board
 
-def start_server():
-    #values = {''}
-    #data = urllib.parse.urlencode(values)
-    #data = data.encode('utf-8')
-    #req = urllib.request.Request(url,data)
-    #resp = urllib.request.urlopen(req)
-    #respData = resp.read()
-    #print (respData)
+def start_server(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     try:
-        connection = http.client.HTTPConnection("www.google.com")
-        connection.request("GET", "/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png")
-        #data = urllib.request.urlopen('https://www.google.com/search?q=test')
-        response = connection.getresponse()
-        r = response.read()
-        print (r)
-        connection.close()
+        server_address = ('', portNum)
+        httpd = server_class(server_address, handler_class)
+        httpd.serve_forever()
+
     except Exception as e:
         print(str(e))
 

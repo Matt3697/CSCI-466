@@ -8,16 +8,18 @@
 import sys
 import http.client
 
+ipAdd      = sys.argv[1]  #IP Address
+portNum    = sys.argv[2]  #port number
+x          = sys.argv[3]  #x coordinate
+y          = sys.argv[4]  #y coordinate
+
+def throw_argument_error():
+    print ("Error: incorrect arguments. Try python3 server.py <ip_address> <port_number> <xCoordinate> <yCoordinate>")
+    sys.exit(0)
 
 def handle_args():
-    if (arg_length != 5):
+    if(len(sys.argv) != 5):
         throw_argument_error()
-    else:
-        ipAdd    = sys.argv[1] #IP Address
-        portNum    = sys.argv[2]  #port number
-        portNum    = int(portNum) #convert port number to an integer
-        x          = int(sys.argv[3])  #x coordinate
-        y          = int(sys.argv[4])  #y coordinate
 
 def client_connection():
     try:
