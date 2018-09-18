@@ -8,27 +8,23 @@
 import sys
 import http.client
 
-#ipAdd    = sys.argv[1] #IP Address
-portNum  = sys.argv[1] #port number
-portNum  = int(portNum)
-x        = sys.argv[2] #x coordinate
-y        = sys.argv[3] #y coordinate
-
 
 def handle_args():
-    if (arg_length != 4):
+    if (arg_length != 5):
         throw_argument_error()
     else:
-        portNum    = sys.argv[1]  #port number
+        ipAdd    = sys.argv[1] #IP Address
+        portNum    = sys.argv[2]  #port number
         portNum    = int(portNum) #convert port number to an integer
-        x          = int(sys.argv[2])  #x coordinate
-        y          = int(sys.argv[3])  #y coordinate
+        x          = int(sys.argv[3])  #x coordinate
+        y          = int(sys.argv[4])  #y coordinate
 
 def client_connection():
     try:
-        connection = http.client.HTTPConnection("www.google.com")
-        connection.request("GET", "/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png")
-        response = connection.getresponse()
+        connection = http.client.HTTPConnection(ipAdd) #get conneciton to other system
+        newAddress = 'http://' + ipAdd + ':' + portNum + '?x=' + x + '&y=' + y #concatonate ip address w/ the port number and x/y coordinates
+        connection.request("POST", newAddress) #request a post to the new address
+        response = connection.getresponse()    #get the response
         r = response.read()
         print (r)
         connection.close()
