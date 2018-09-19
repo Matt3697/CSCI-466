@@ -14,7 +14,7 @@ x          = sys.argv[3]  #x coordinate
 y          = sys.argv[4]  #y coordinate
 
 def throw_argument_error():
-    print ("Error: incorrect arguments. Try python server.py <ip_address> <port_number> <xCoordinate> <yCoordinate>")
+    print ("Error: incorrect arguments. Try python3 server.py <ip_address> <port_number> <xCoordinate> <yCoordinate>")
     sys.exit(0)
 
 def handle_args():
@@ -23,13 +23,13 @@ def handle_args():
 
 def client_connection():
     try:
-        newAddress = 'http://' + ipAdd + ':' + portNum #+ '?x=' + x + '&y=' + y #concatonate ip address w/ the port number and x/y coordinates
+        newAddress = 'http://' + ipAdd + ':' + portNum
         print("Connecting to " + newAddress)
         payload = {'x':x, 'y':y}
         r = requests.post(newAddress, data=payload)
         r.status_code
         print(r.text)
-        
+
     except Exception as e:
         print(str(e))
 

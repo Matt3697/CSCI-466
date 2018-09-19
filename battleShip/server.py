@@ -10,17 +10,13 @@ import sys
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 
-class HandleRequests(BaseHTTPRequestHandler):
+class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         #coordinates = self.get_coordinates()
         print("yo")
         self.send_response(200)
         self.end_headers()
         # check here if the spot on the board gets hit
-
-    #def do_GET(self):
-        #self.send_response(404)
-        #self.end_headers()
 
     #def get_coordinates(self):
         #raw_data = self.rfile.read(int(self.headers['Content-Length']))
@@ -43,8 +39,8 @@ def handle_args():
 def start_server():
     try:
         server_address = ('127.0.0.1', portNum)
-        print("Connecting to 127.0.0.1 on port " + port)
-        httpd = HTTPServer(server_address, HandleRequests)
+        print("Starting server 127.0.0.1 on port " + port)
+        httpd = HTTPServer(server_address, RequestHandler)
         httpd.serve_forever()
     except Exception as e:
         print(str(e))
@@ -53,7 +49,7 @@ def start_server():
 def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
-    start_server() #create connection with server
+    start_server()
     print ("End of script.")
 
 main()
