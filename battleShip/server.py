@@ -13,7 +13,7 @@ from http.server import CGIHTTPRequestHandler
 
 class HandleRequests(BaseHTTPRequestHandler):
     def do_POST(self):
-        print("FUCKING POST MESSAGE")
+        print("")
         coordinates = self.get_coordinates()
         self.send_response(200)
         self.end_headers()
@@ -49,8 +49,10 @@ def start_server(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
         server_address = ('', portNum)
         httpd = server_class(server_address, handler_class)
         httpd.serve_forever()
-        requestHandler = CGIHTTPRequestHandler(request, client_address, server)
-        requestHandler.do_POST()
+        httpd.send_response(204, message=none,explain=none)
+        httpd.do_POST()
+        #requestHandler = CGIHTTPRequestHandler(request, client_address, server)
+        #requestHandler.do_POST()
     except Exception as e:
         print(str(e))
 
