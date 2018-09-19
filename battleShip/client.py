@@ -25,7 +25,7 @@ def client_connection():
     try:
         connection = http.client.HTTPConnection(ipAdd) #get conneciton to other system
         newAddress = 'http://' + ipAdd + ':' + portNum + '?x=' + x + '&y=' + y #concatonate ip address w/ the port number and x/y coordinates
-        connection.request("POST", newAddress) #request a post to the new address
+        connection.request("POST",newAddress) #request a post to the new address
         response = connection.getresponse()    #get the response
         r = response.read()
         print (r)

@@ -9,6 +9,25 @@
 import sys
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
+from http.server import CGIHTTPRequestHandler
+
+class HandleRequests(BaseHTTPRequestHandler):
+    def do_POST(self):
+        print("FUCKING POST MESSAGE")
+        coordinates = self.get_coordinates()
+        self.send_response(200)
+        self.end_headers()
+        # need to check here if the spot on the board gets hit
+
+    def do_GET(self):
+        self.send_response(404)
+        self.end_headers()
+
+    def get_coordinates(self):
+        raw_data = self.rfile.read(int(self.headers['Content-Length']))
+        byte_coordinates = dict(parse_qsl(raw_data))
+        string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()} #convert from bytes to str
+        return string_coordinates
 
 arg_length = len(sys.argv)
 portNum    = 0
@@ -30,7 +49,8 @@ def start_server(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
         server_address = ('', portNum)
         httpd = server_class(server_address, handler_class)
         httpd.serve_forever()
-
+        requestHandler = CGIHTTPRequestHandler(request, client_address, server)
+        requestHandler.do_POST()
     except Exception as e:
         print(str(e))
 
