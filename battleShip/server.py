@@ -13,11 +13,11 @@ from http.server import CGIHTTPRequestHandler
 
 class HandleRequests(BaseHTTPRequestHandler):
     def do_POST(self):
-        print("")
         coordinates = self.get_coordinates()
+        print("yo")
         self.send_response(200)
         self.end_headers()
-        # need to check here if the spot on the board gets hit
+        # check here if the spot on the board gets hit
 
     def do_GET(self):
         self.send_response(404)
@@ -41,18 +41,14 @@ def handle_args():
         throw_argument_error()
     else:
         portNum    = sys.argv[1]  #port number
-        portNum    = int(portNum) #convert port number to an integer
+        #portNum    = int(portNum) #convert port number to an integer
         fileName   = sys.argv[2]  #file name for game board
 
-def start_server(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
+def start_server():
     try:
-        server_address = ('', portNum)
-        httpd = server_class(server_address, handler_class)
+        server_address = ('127.0.0.1', portNum)
+        httpd = HTTPServer(server_address, HandleRequests)
         httpd.serve_forever()
-        httpd.send_response(204, message=none,explain=none)
-        httpd.do_POST()
-        #requestHandler = CGIHTTPRequestHandler(request, client_address, server)
-        #requestHandler.do_POST()
     except Exception as e:
         print(str(e))
 
