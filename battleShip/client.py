@@ -21,7 +21,6 @@ def throw_argument_error():
 def handle_args():
     if(len(sys.argv) != 5):
         throw_argument_error()
-
 def server_connection():
     try:
         newAddress = 'http://' + ipAdd + ':' + portNum

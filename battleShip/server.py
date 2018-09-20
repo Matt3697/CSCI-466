@@ -29,10 +29,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         return flag
 
     def send_result(self, coordinates):
-        if(type(coordinates['x'] != 'int') or type(coordinates['y']) != 'int'):
-            msg = "Bad Request"
-            self.send_response(404, msg)
-            return
+        #if(type(coordinates['x'] != 'int') or type(coordinates['y']) != 'int'):
+            #msg = "Bad Request"
+            #self.send_response(404, msg)
+            #return
         y = int(coordinates['x'])
         x = int(coordinates['y'])
         if(x >= 10 or y >= 10):
@@ -87,9 +87,8 @@ def handle_board():#populate the board with the contents of own_board
 
 def handle_args():#throw error and exit if arguments are incorrect.
     if (arg_length != 4):
-        throw_argument_error()
-        print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name> <file_name>")
-        sys.exit(0)
+        return False
+
 
 def start_server():
     try:
@@ -102,7 +101,10 @@ def start_server():
 
 def main():
     print ("Processing...")
-    handle_args()  #make sure arguments are valid
+    if(handle_args() ==  False):
+        msg ("Bad Request")
+        self.send_response(404, msg)
+        return  #make sure arguments are valid
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
     for x in board_arr:
         print(x)
