@@ -15,10 +15,18 @@ def stop_server():
     httpd.close_connection()
 
 class RequestHandler(BaseHTTPRequestHandler):
+
+    def send_response(coordinates):
+        #if we hit a boat 
+        #if we miss the boat
+        #if we hit the same spot
+        #if we hit out of bound
+        #if we sink the boat
+
     def do_POST(self):
         coordinates = self.get_coordinates()
-        print(coordinates)
-        self.send_response(200)
+        #print(coordinates)
+        self.send_response(coordinates)
         self.end_headers()
         # check here if the spot on the board gets hit
 
