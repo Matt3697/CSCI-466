@@ -12,21 +12,34 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
 
 def handle_board(file):
-    
+
 
 class RequestHandler(BaseHTTPRequestHandler):
 
     def send_response(coordinates):
-        #if we hit a boat return hit=1
+        xCoord = coordinates.get[x]
+        yCoord = coordinates.get[y]
+        if(type(xCoord) != 'int' or type(yCoord) != 'int'): #if format not correct HTTP Bad Request
+            send_resonse(400)
+        if(board_arr[x][y] != '_'):#if we hit a boat return hit=1
             #if we sink return hit=1 sink=(c,b,r,s,or d)
-        #if we miss the boat return hit=0
-        #if we hit the same spot return HTTP Gone
-        #if we hit out of bound return HTTP Not Found
-        #if format is bad return HTTP Bad Request
+            msg = 'hit'
+            send_response(200,msg)
+        elif(board_arr[x][y] == '_'):#if we miss the boat return hit=0
+            send_resonse(200,msg)
+            msg = 'miss'
+        elif(board_arr[x][y] == 'x'): #if we hit the same spot return HTTP Gone
+            send_response(410)
+        elif(coordinates.get[x] > len(board_arr[][0]) or coordinates.get[y] > len(board_arr[0][])):#if we hit out of bound return HTTP Not Found
+            send_response(404)
+        elif(coordinates.get[x] < 0 or coordinates.get[y] < 0):#lower bound check
+            send_resonse(404)
+        else:
+            send_response(400)
+            print("something not so good happened.")
 
     def do_POST(self):
         coordinates = self.get_coordinates()
-        #print(coordinates)
         self.send_response(coordinates)
         self.end_headers()
 
