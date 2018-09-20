@@ -17,8 +17,8 @@ def stop_server():
 class RequestHandler(BaseHTTPRequestHandler):
 
     def send_response(coordinates):
-        #if we hit a boat 
-        #if we miss the boat
+        #if we hit a boat retrun HIT 1
+        #if we miss the boat return 
         #if we hit the same spot
         #if we hit out of bound
         #if we sink the boat
