@@ -17,8 +17,11 @@ portNum = int(port)
 board_arr = [['_' for x in range(10)] for y in range(10)]
 
 class RequestHandler(BaseHTTPRequestHandler):
-    for x in board_arr:
-        print(x)
+    def sunk_ship(self, ship_identifier):
+        for x in board_arr:
+            if(x == ship_identifier):
+                return False
+        return True
     def send_result(self, coordinates):
         y = int(coordinates['x'])
         x = int(coordinates['y'])
@@ -27,7 +30,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
            board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a boat return hit=1
             msg = 'hit=1'
+            ship_identity = board_arr[x][y]
             board_arr[x][y] = 'H' #mark the spot that has been hit
+            if(self.sunk_ship(ship_identity) == True):#if we have sunk a ship
+                msg = 'hit=1\&sink=' + ship_identity
             self.send_response(200,msg)
         elif(board_arr[x][y] == '_'):#if we miss the boat return hit=0
             msg = 'hit=0'
@@ -78,6 +84,8 @@ def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
+    for x in board_arr:
+        print(x)
     start_server()
     print ("End of script.")
 
