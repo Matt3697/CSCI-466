@@ -21,12 +21,13 @@ def handle_args():
     if(len(sys.argv) != 5):
         throw_argument_error()
 
-def client_connection():
+def server_connection():
     try:
         newAddress = 'http://' + ipAdd + ':' + portNum
-        print("Connecting to " + newAddress)
+        print("Firing at " + newAddress + " at x=" + x + "&y=" + y)
         payload = {'x':x, 'y':y}
         r = requests.post(newAddress, data=payload)
+
         r.status_code
         print(r.text)
 
@@ -36,7 +37,7 @@ def client_connection():
 def main():
     print ("Processing...")
     handle_args()       #make sure arguments are valid
-    client_connection() #create connection with server
-    print ("End of script.")
+    server_connection() #create connection with server
+    print ("End of turn.")
 
 main()
