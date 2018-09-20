@@ -7,9 +7,12 @@
 #
 
 import sys
+
+import numpy
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
+from numpy import savetxt
 
 arg_length = len(sys.argv)
 port    = sys.argv[1]
@@ -17,8 +20,6 @@ portNum = int(port)
 board_arr = [['_' for x in range(10)] for y in range(10)]
 
 class RequestHandler(BaseHTTPRequestHandler):
-    for x in board_arr:
-        print(x)
     def send_result(self, coordinates):
         y = int(coordinates['x'])
         x = int(coordinates['y'])
@@ -41,6 +42,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(400)
             print("bad format")
+        update_board()
 
     def do_POST(self):
         coordinates = self.get_coordinates()
@@ -52,6 +54,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         byte_coordinates = dict(parse_qsl(data))
         string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()}
         return string_coordinates
+
+def update_board(): #update the board after player move
+    numpy.savetxt('new_board.txt', board_arr, fmt='%s')
 
 def handle_board():#populate the board with the contents of own_board
     global board_arr
@@ -78,6 +83,8 @@ def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
+    for x in board_arr:
+        print(x)
     start_server()
     print ("End of script.")
 
