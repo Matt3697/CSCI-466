@@ -11,8 +11,8 @@ from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
 
-def stop_server():
-    httpd.close_connection()
+def handle_board(file):
+    
 
 class RequestHandler(BaseHTTPRequestHandler):
 
@@ -20,7 +20,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         #if we hit a boat return hit=1
             #if we sink return hit=1 sink=(c,b,r,s,or d)
         #if we miss the boat return hit=0
-        #if we hit the same spot return HTTP Gone 
+        #if we hit the same spot return HTTP Gone
         #if we hit out of bound return HTTP Not Found
         #if format is bad return HTTP Bad Request
 
@@ -29,12 +29,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         #print(coordinates)
         self.send_response(coordinates)
         self.end_headers()
-        # check here if the spot on the board gets hit
 
     def get_coordinates(self):
         data = self.rfile.read(int(self.headers['Content-Length']))
         byte_coordinates = dict(parse_qsl(data))
-        string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()} #convert from bytes to str
+        string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()}
         return string_coordinates
 
 arg_length = len(sys.argv)
@@ -62,6 +61,7 @@ def start_server():
 def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
+    handle_board() #open own_board.txt and populate matrix with contents
     start_server()
     print ("End of script.")
 
