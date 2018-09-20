@@ -7,6 +7,7 @@
 #
 import sys
 import requests
+from urllib.parse import parse_qsl
 
 ipAdd      = sys.argv[1]  #IP Address
 portNum    = sys.argv[2]  #port number
@@ -27,9 +28,7 @@ def server_connection():
         print("Firing at " + newAddress + " at x=" + x + "&y=" + y)
         payload = {'x':x, 'y':y}
         r = requests.post(newAddress, data=payload)
-
-        r.status_code
-        print(r.text)
+        print(r.status_code, r.reason)
 
     except Exception as e:
         print(str(e))

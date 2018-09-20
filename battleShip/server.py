@@ -17,14 +17,14 @@ def stop_server():
 class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         coordinates = self.get_coordinates()
-        #print(coordinates)
-        self.send_response(200, message='OK')
+        print(coordinates)
+        self.send_response(200)
         self.end_headers()
         # check here if the spot on the board gets hit
 
     def get_coordinates(self):
-        raw_data = self.rfile.read(int(self.headers['Content-Length']))
-        byte_coordinates = dict(parse_qsl(raw_data))
+        data = self.rfile.read(int(self.headers['Content-Length']))
+        byte_coordinates = dict(parse_qsl(data))
         string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()} #convert from bytes to str
         return string_coordinates
 
