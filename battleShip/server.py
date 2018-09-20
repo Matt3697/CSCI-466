@@ -15,21 +15,13 @@ arg_length = len(sys.argv)
 port    = sys.argv[1]
 portNum = int(port)
 
-def handle_board():
-    with open("own_board.txt") as textFile:
-        board_arr = [list(line.rstrip()) for line in textFile]
-        for x in board_arr:
-            print(x)
-
 class RequestHandler(BaseHTTPRequestHandler):
-
-    def send_result(x,y):
-        print(x,y)
-        xCoord = x#coordinates.get[x]
-        yCoord = y#coordinates.get[y]
-        if(type(xCoord) != 'int' or type(yCoord) != 'int'): #if format not correct HTTP Bad Request
-            self.send_response(400)
-        elif(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
+    def send_result(self, coordinates):
+        xCoord = int(coordinates['x'])
+        yCoord = int(coordinates['y'])
+        print(type(xCoord))
+        print(type(yCoord))
+        if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
              board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a boat return hit=1
             msg = 'hit'
             self.send_response(200,msg)
@@ -44,7 +36,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(404)
         else:
             self.send_response(400)
-            print("something not so good happened.")
+            print("bad format")
 
     def do_POST(self):
         coordinates = self.get_coordinates()
@@ -56,6 +48,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         byte_coordinates = dict(parse_qsl(data))
         string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()}
         return string_coordinates
+
+def handle_board():
+    with open("own_board.txt") as textFile:
+        board_arr = [list(line.rstrip()) for line in textFile]
+        for x in board_arr:
+            print(x)
 
 def throw_argument_error():
     print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name> <file_name>")
@@ -74,11 +72,10 @@ def start_server():
     except Exception as e:
         print(str(e))
 
-
 def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
-    handle_board() #open own_board.txt and populate matrix with contents
+    #handle_board() #open own_board.txt and populate matrix with contents
     start_server()
     print ("End of script.")
 
