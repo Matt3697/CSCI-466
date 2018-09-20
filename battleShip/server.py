@@ -11,12 +11,15 @@ from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
 
-def handle_board(file):
-    
+def handle_board():
+    with open("own_board.txt") as textFile:
+        board_arr = [list(line.rstrip()) for line in textFile]
+        for x in board_arr:
+            print(x)
 
 class RequestHandler(BaseHTTPRequestHandler):
 
-    def send_response(coordinates):
+    #def send_response(coordinates):
         #if we hit a boat return hit=1
             #if we sink return hit=1 sink=(c,b,r,s,or d)
         #if we miss the boat return hit=0
@@ -41,11 +44,11 @@ port    = sys.argv[1]
 portNum = int(port)
 
 def throw_argument_error():
-    print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name>")
+    print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name> <file_name>")
     sys.exit(0)
 
 def handle_args():
-    if (arg_length != 3):
+    if (arg_length != 4):
         throw_argument_error()
 
 def start_server():
