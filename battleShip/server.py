@@ -21,13 +21,24 @@ board_arr = [['_' for x in range(10)] for y in range(10)]
 
 class RequestHandler(BaseHTTPRequestHandler):
     def sunk_ship(self, ship_identifier):
+        flag = True
         for x in board_arr:
-            if(x == ship_identifier):
-                return False
-        return True
+            for i in x:
+                if( i == ship_identifier): #if we find a Character belonging to the ship still in the board
+                    flag = False
+        return flag
+
     def send_result(self, coordinates):
+        if(type(coordinates['x'] != 'int') or type(coordinates['y']) != 'int'):
+            msg = "Bad Request"
+            self.send_response(404, msg)
+            return
         y = int(coordinates['x'])
         x = int(coordinates['y'])
+        if(x >= 10 or y >= 10):
+            msg = "Not Found"
+            self.send_response(404, msg)
+            return
         print(x,y)
         print(board_arr[x][y])
         if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
@@ -37,7 +48,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             board_arr[x][y] = 'H' #mark the spot that has been hit
             if(self.sunk_ship(ship_identity) == True):#if we have sunk a ship
                 msg = 'hit=1\&sink=' + ship_identity
-            self.send_response(200,msg)
+                self.send_response(200,msg)
+            else:
+                self.send_response(200,msg)
         elif(board_arr[x][y] == '_'):#if we miss the boat return hit=0
             msg = 'hit=0'
             self.send_response(200,msg)
@@ -48,8 +61,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif(x < 0 or y < 0):#lower bound check
             self.send_response(404)
         else:
+            msg = "Something went very wrong."
             self.send_response(400)
-            print("bad format")
         update_board()
 
     def do_POST(self):
