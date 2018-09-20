@@ -17,19 +17,22 @@ portNum = int(port)
 board_arr = [['_' for x in range(10)] for y in range(10)]
 
 class RequestHandler(BaseHTTPRequestHandler):
+    for x in board_arr:
+        print(x)
     def send_result(self, coordinates):
-        x = int(coordinates['x'])
-        y = int(coordinates['y'])
+        y = int(coordinates['x'])
+        x = int(coordinates['y'])
         print(x,y)
         print(board_arr[x][y])
         if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
-             board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a boat return hit=1
-            msg = 'hit'
+           board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a boat return hit=1
+            msg = 'hit=1'
+            board_arr[x][y] = 'H' #mark the spot that has been hit
             self.send_response(200,msg)
         elif(board_arr[x][y] == '_'):#if we miss the boat return hit=0
-            msg = 'miss'
+            msg = 'hit=0'
             self.send_response(200,msg)
-        elif(board_arr[x][y] == 'x'): #if we hit the same spot return HTTP Gone
+        elif(board_arr[x][y] == 'H'): #if we hit the same spot return HTTP Gone
             self.send_response(410)
         elif(x > 10 or y > 10):#if we hit out of bound return HTTP Not Found
             self.send_response(404)
@@ -50,20 +53,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()}
         return string_coordinates
 
-def handle_board():
+def handle_board():#populate the board with the contents of own_board
     global board_arr
     with open("own_board.txt") as textFile:
         board_arr = [list(line.rstrip()) for line in textFile]
     return board_arr
-def throw_argument_error():
-    print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name> <file_name>")
-    sys.exit(0)
 
-def handle_args():
+def handle_args():#throw error and exit if arguments are incorrect.
     if (arg_length != 4):
         throw_argument_error()
+        print ("Error: incorrect arguments. Try python3 server.py <port_number> <file_name> <file_name>")
+        sys.exit(0)
 
-def start_server(board_arr):
+def start_server():
     try:
         server_address = ('127.0.0.1', portNum)
         print("Starting server 127.0.0.1 on port " + port)
@@ -76,9 +78,7 @@ def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
-    for x in board_arr:
-        print(x)
-    start_server(board_arr)
+    start_server()
     print ("End of script.")
 
 main()
