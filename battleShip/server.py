@@ -14,13 +14,14 @@ from urllib.parse import parse_qsl
 arg_length = len(sys.argv)
 port    = sys.argv[1]
 portNum = int(port)
+board_arr = [[0 for x in range(10)] for y in range(10)]
 
 class RequestHandler(BaseHTTPRequestHandler):
     def send_result(self, coordinates):
-        xCoord = int(coordinates['x'])
-        yCoord = int(coordinates['y'])
-        print(type(xCoord))
-        print(type(yCoord))
+        x = int(coordinates['x'])
+        y = int(coordinates['y'])
+        print(x,y)
+        print(board_arr[x][y])
         if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
              board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a boat return hit=1
             msg = 'hit'
@@ -30,9 +31,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_resonse(200,msg)
         elif(board_arr[x][y] == 'x'): #if we hit the same spot return HTTP Gone
             self.send_response(410)
-        elif(coordinates.get[x] > len(board_arr) or coordinates.get[y] > len(board_arr[0])):#if we hit out of bound return HTTP Not Found
+        elif(x > 10 or y > 10):#if we hit out of bound return HTTP Not Found
             self.send_response(404)
-        elif(coordinates.get[x] < 0 or coordinates.get[y] < 0):#lower bound check
+        elif(x < 0 or y < 0):#lower bound check
             self.send_response(404)
         else:
             self.send_response(400)
@@ -75,7 +76,7 @@ def start_server():
 def main():
     print ("Processing...")
     handle_args()  #make sure arguments are valid
-    #handle_board() #open own_board.txt and populate matrix with contents
+    handle_board() #open own_board.txt and populate matrix with contents
     start_server()
     print ("End of script.")
 
