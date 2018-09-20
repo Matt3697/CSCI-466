@@ -17,11 +17,12 @@ def stop_server():
 class RequestHandler(BaseHTTPRequestHandler):
 
     def send_response(coordinates):
-        #if we hit a boat retrun HIT 1
-        #if we miss the boat return 
-        #if we hit the same spot
-        #if we hit out of bound
-        #if we sink the boat
+        #if we hit a boat return hit=1
+            #if we sink return hit=1 sink=(c,b,r,s,or d)
+        #if we miss the boat return hit=0
+        #if we hit the same spot return HTTP Gone 
+        #if we hit out of bound return HTTP Not Found
+        #if format is bad return HTTP Bad Request
 
     def do_POST(self):
         coordinates = self.get_coordinates()
