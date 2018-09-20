@@ -7,9 +7,12 @@
 #
 
 import sys
+
+import numpy
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
+from numpy import savetxt
 
 arg_length = len(sys.argv)
 port    = sys.argv[1]
@@ -47,6 +50,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(400)
             print("bad format")
+        update_board()
 
     def do_POST(self):
         coordinates = self.get_coordinates()
@@ -58,6 +62,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         byte_coordinates = dict(parse_qsl(data))
         string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()}
         return string_coordinates
+
+def update_board(): #update the board after player move
+    numpy.savetxt('new_board.txt', board_arr, fmt='%s')
 
 def handle_board():#populate the board with the contents of own_board
     global board_arr
