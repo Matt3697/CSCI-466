@@ -15,6 +15,8 @@ ipAdd      = sys.argv[1]  #IP Address
 portNum    = sys.argv[2]  #port number
 x          = sys.argv[3]  #x coordinate
 y          = sys.argv[4]  #y coordinate
+i          = 0
+sunk_ships = ['_','_','_','_','_']
 opp_board_arr = [['_' for x in range(10)] for y in range(10)]
 
 def throw_argument_error():
@@ -25,9 +27,24 @@ def handle_args():
     if(len(sys.argv) != 5):
         throw_argument_error()
 
+def reset_board(): #reset the board after a game has finished
+    opp_board_arr = [['_' for x in range(10)] for y in range(10)]
+    #for x in opp_board_arr:
+        #print(x)
+    numpy.savetxt('opp_board.txt', opp_board_arr, fmt='%s')
+
 def process_result(reason):
-    if(reason == "hit=1" or reason == "hit=1\&sink=D" or reason == "hit=1\&sink=C" or reason == "hit=1\&sink=S"
-    or reason == "hit=1\&sink=B" or reason == "hit=1\&sink=R"): #update opp_board with an X at the coordinates that we fire at
+    reason_len = len(reason)
+    sub_reason = reason[reason_len - 1]
+    if(reason == "hit=1" or reason == "hit=1\&sink=D" or reason == "hit=1\&sink=C" or reason == "hit=1\&sink=S" or reason == "hit=1\&sink=B" or reason == "hit=1\&sink=R" or sub_reason == 'o'): #update opp_board with an X at the coordinates that we fire at
+        if(sub_reason == 'D' or sub_reason == 'C' or sub_reason == 'S' or sub_reason == 'B' or sub_reason == 'R'):
+            print("You've hit and sank ship " + sub_reason + "!")
+        elif(sub_reason == 'o'):
+            print("You've won the game!")
+            for x in opp_board_arr:
+                print(x)
+            reset_board()
+            return
         opp_board_arr[int(y)][int(x)] = 'X'
     elif(reason == "Gone"): #don't update the board if we already fired at that spot
         return
@@ -38,15 +55,16 @@ def process_result(reason):
         print(i)
 
 def server_connection():
-    try:
-        newAddress = 'http://' + ipAdd + ':' + portNum
-        print("Firing at " + newAddress + " at x=" + x + "&y=" + y)
-        payload = {'x':x, 'y':y}
-        r = requests.post(newAddress, data=payload)#the fire message
-        print(r.status_code, r.reason)
-        process_result(r.reason)
-    except Exception as e:
-        print(str(e))
+    #try:
+    newAddress = 'http://' + ipAdd + ':' + portNum
+    print("Firing at " + newAddress + " at x=" + x + "&y=" + y)
+    payload = {'x':x, 'y':y}
+    r = requests.post(newAddress, data=payload)#the fire message
+    print(r.status_code, r.reason)
+    process_result(r.reason)
+
+    #except Exception as e:
+        #print(str(e) + ' HI')
 
 def handle_board():#populate the board with the contents of opp_board
     global opp_board_arr

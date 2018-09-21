@@ -18,6 +18,7 @@ arg_length = len(sys.argv)
 port    = sys.argv[1]
 portNum = int(port)
 board_arr = [['_' for x in range(10)] for y in range(10)]
+sunk_ships = []
 
 class RequestHandler(BaseHTTPRequestHandler):
     def sunk_ship(self, ship_identifier):
@@ -29,25 +30,22 @@ class RequestHandler(BaseHTTPRequestHandler):
         return flag
 
     def send_result(self, coordinates):
-        #if(type(coordinates['x'] != 'int') or type(coordinates['y']) != 'int'):
-            #msg = "Bad Request"
-            #self.send_response(404, msg)
-            #return
         y = int(coordinates['x'])
         x = int(coordinates['y'])
-        if(x >= 10 or y >= 10):
+        if(x >= 10 or y >= 10): #if they fire out of bounds
             msg = "Not Found"
             self.send_response(404, msg)
             return
-        print(x,y)
-        print(board_arr[x][y])
-        if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or
-           board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a boat return hit=1
+        if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a ship return hit=1
             msg = 'hit=1'
             ship_identity = board_arr[x][y]
             board_arr[x][y] = 'H' #mark the spot that has been hit
             if(self.sunk_ship(ship_identity) == True):#if we have sunk a ship
                 msg = 'hit=1\&sink=' + ship_identity
+                sunk_ships.append(ship_identity) #add ship to list of sunken ships
+                if(len(sunk_ships) == 1):
+                    msg = msg + '\g_o' #g_o: game over
+                    self.send_response(200, msg)
                 self.send_response(200,msg)
             else:
                 self.send_response(200,msg)
@@ -65,16 +63,29 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(400)
         update_board()
 
-    def do_POST(self):
-        coordinates = self.get_coordinates()
-        self.send_result(coordinates)
+    def do_GET(self):
+        try:
+            f = open('own_board.html','rb')
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+            return
+        except IOError:
+            self.send_error(404, 'File Not Found: %s' % self.path)
+
+    def do_POST(self): #handle POST requests
+        the_coordinates = self.get_coordinates()
+        self.send_result(the_coordinates)
         self.end_headers()
 
-    def get_coordinates(self):
+    def get_coordinates(self): #extract the data that was sent into an array
         data = self.rfile.read(int(self.headers['Content-Length']))
-        byte_coordinates = dict(parse_qsl(data))
-        string_coordinates = {key.decode(): val.decode() for key, val in byte_coordinates.items()}
-        return string_coordinates
+        coordinates_arr = dict(parse_qsl(data))
+        coordinates = {key.decode(): val.decode() for key, val in coordinates_arr.items()}
+        return coordinates
 
 def update_board(): #update the board after player move
     numpy.savetxt('new_board.txt', board_arr, fmt='%s')
@@ -101,10 +112,6 @@ def start_server():
 
 def main():
     print ("Processing...")
-    if(handle_args() ==  False):
-        msg ("Bad Request")
-        self.send_response(404, msg)
-        return  #make sure arguments are valid
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
     for x in board_arr:
         print(x)
