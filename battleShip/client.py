@@ -29,8 +29,6 @@ def handle_args():
 
 def reset_board(): #reset the board after a game has finished
     opp_board_arr = [['_' for x in range(10)] for y in range(10)]
-    #for x in opp_board_arr:
-        #print(x)
     numpy.savetxt('opp_board.txt', opp_board_arr, fmt='%s')
 
 def process_result(reason):
@@ -41,8 +39,6 @@ def process_result(reason):
             print("You've hit and sank ship " + sub_reason + "!")
         elif(sub_reason == 'o'):
             print("You've won the game!")
-            for x in opp_board_arr:
-                print(x)
             reset_board()
             return
         opp_board_arr[int(y)][int(x)] = 'X'
@@ -55,16 +51,12 @@ def process_result(reason):
         print(i)
 
 def server_connection():
-    #try:
     newAddress = 'http://' + ipAdd + ':' + portNum
     print("Firing at " + newAddress + " at x=" + x + "&y=" + y)
     payload = {'x':x, 'y':y}
     r = requests.post(newAddress, data=payload)#the fire message
     print(r.status_code, r.reason)
     process_result(r.reason)
-
-    #except Exception as e:
-        #print(str(e) + ' HI')
 
 def handle_board():#populate the board with the contents of opp_board
     global opp_board_arr

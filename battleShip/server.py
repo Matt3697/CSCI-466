@@ -13,6 +13,7 @@ from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
 from numpy import savetxt
+import codecs
 
 arg_length = len(sys.argv)
 port    = sys.argv[1]
@@ -64,17 +65,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         update_board()
 
     def do_GET(self):
-        try:
-            f = open('own_board.html','rb')
-
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(f.read())
-            f.close()
-            return
-        except IOError:
-            self.send_error(404, 'File Not Found: %s' % self.path)
+        f = open('own_board.html','rb')
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(f.read())
+        f.close()
+        return
 
     def do_POST(self): #handle POST requests
         the_coordinates = self.get_coordinates()
@@ -88,7 +85,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return coordinates
 
 def update_board(): #update the board after player move
-    numpy.savetxt('new_board.txt', board_arr, fmt='%s')
+    numpy.savetxt('own_board.txt', board_arr, fmt='%s')
 
 def handle_board():#populate the board with the contents of own_board
     global board_arr
