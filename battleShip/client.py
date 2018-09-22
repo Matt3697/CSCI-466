@@ -64,7 +64,6 @@ def handle_board():#populate the board with the contents of opp_board
         opp_board_arr = [line.split() for line in textFile]
     return opp_board_arr
 
-
 def main():
     print ("Processing...")
     opp_board_arr = handle_board()

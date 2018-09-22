@@ -65,11 +65,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         update_board()
 
     def do_GET(self):
-        f = open('own_board.html','rb')
+        f = open('own_board.txt','rb')
+        data = f.read()
+        decodedata = data.decode('utf-8').replace('\n','<br>')
+        the_data = decodedata.encode('utf-8')
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write(f.read())
+        self.wfile.write(the_data)
         f.close()
         return
 
@@ -90,7 +93,7 @@ def update_board(): #update the board after player move
 def handle_board():#populate the board with the contents of own_board
     global board_arr
     with open("own_board.txt") as textFile:
-        board_arr = [list(line.rstrip()) for line in textFile]
+        board_arr = [list(line.split()) for line in textFile]
     return board_arr
 
 def handle_args():#throw error and exit if arguments are incorrect.
