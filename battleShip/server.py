@@ -40,11 +40,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         if(board_arr[x][y] == 'C' or board_arr[x][y] == 'B' or board_arr[x][y] == 'R' or board_arr[x][y] == 'S' or board_arr[x][y]== 'D'):#if we hit a ship return hit=1
             msg = 'hit=1'
             ship_identity = board_arr[x][y]
-            board_arr[x][y] = 'H' #mark the spot that has been hit
+            board_arr[x][y] = 'X' #mark the spot that has been hit
             if(self.sunk_ship(ship_identity) == True):#if we have sunk a ship
                 msg = 'hit=1\&sink=' + ship_identity
                 sunk_ships.append(ship_identity) #add ship to list of sunken ships
-                if(len(sunk_ships) == 1):
+                if(len(sunk_ships) == 5):
                     msg = msg + '\g_o' #g_o: game over
                     self.send_response(200, msg)
                 self.send_response(200,msg)
@@ -53,7 +53,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif(board_arr[x][y] == '_'):#if we miss the boat return hit=0
             msg = 'hit=0'
             self.send_response(200,msg)
-        elif(board_arr[x][y] == 'H'): #if we hit the same spot return HTTP Gone
+        elif(board_arr[x][y] == 'X'): #if we hit the same spot return HTTP Gone
             self.send_response(410)
         elif(x > 10 or y > 10):#if we hit out of bound return HTTP Not Found
             self.send_response(404)
@@ -93,7 +93,7 @@ def update_board(): #update the board after player move
 def handle_board():#populate the board with the contents of own_board
     global board_arr
     with open("own_board.txt") as textFile:
-        board_arr = [list(line.split()) for line in textFile]
+        board_arr = [list(line.rstrip()) for line in textFile]
     return board_arr
 
 def handle_args():#throw error and exit if arguments are incorrect.
