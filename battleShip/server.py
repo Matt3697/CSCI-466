@@ -13,6 +13,7 @@ from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qsl
 from numpy import savetxt
+import re
 import codecs
 
 arg_length = len(sys.argv)
@@ -65,7 +66,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         update_board()
 
     def do_GET(self):
-        f = open('own_board.txt','rb')
+        if bool(re.search('own', self.path)):
+            f = open('own_board.txt', 'rb')
+        else:
+            f = open('opp_board.txt', 'rb')
         data = f.read()
         decodedata = data.decode('utf-8').replace('\n','<br>')
         the_data = decodedata.encode('utf-8')
