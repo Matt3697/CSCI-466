@@ -10,6 +10,7 @@ import numpy
 import requests
 from urllib.parse import parse_qsl
 from numpy import savetxt
+import re
 
 ipAdd      = sys.argv[1]  #IP Address
 portNum    = sys.argv[2]  #port number
@@ -19,13 +20,33 @@ i          = 0
 sunk_ships = ['_','_','_','_','_']
 opp_board_arr = [['_' for x in range(10)] for y in range(10)]
 
-def throw_argument_error():
-    print ("Error: incorrect arguments. Try python3 server.py <ip_address> <port_number> <xCoordinate> <yCoordinate>")
-    sys.exit(0)
-
 def handle_args():
+    search_ip = re.search('[0-9]{3}\.[0-9]\.[0-9]\.[0-9]', sys.argv[1])#search for a formatted ip_address
+    search_ip = str(search_ip)
+    search_portNum = re.search('[0-9]+', sys.argv[2]) #search for a formatted port Number
+    search_portNum = str(search_portNum)
+    search_x = re.search('[0-9]', sys.argv[3])
+    search_x = str(search_x)
+    search_y = re.search('[0-9]', sys.argv[4])
+    search_y = str(search_y)
+
+    print(search_portNum)
     if(len(sys.argv) != 5):
-        throw_argument_error()
+        print ("Error: incorrect arguments. Try python3 server.py <ip_address> <port_number> <xCoordinate> <yCoordinate>")
+    elif(search_ip == 'None'): #'[0-9]{3}\.[0-9]\.\[0-9]\.\[0-9]'), argv[1]):
+        print("Error: Please enter a valid IP address.")
+        return False
+    elif(search_portNum == 'None'):
+        print("Error: Please enter a valid Port Number.")
+        return False
+    elif(search_x == 'None'):
+        print("Error: Please enter a valid X coordinate. (0-9)")
+        return False
+    elif(search_y == 'None'):
+        print("Error: Please enter a valid Y coordinate. (0-9)")
+        return False
+    else:
+        return True
 
 def reset_board(): #reset the board after a game has finished
     opp_board_arr = [['_' for x in range(10)] for y in range(10)]
@@ -50,7 +71,7 @@ def process_result(reason):
     for i in opp_board_arr:
         print(i)
 
-def server_connection():
+def server_connection(): #function to send a fire post request to the server.
     newAddress = 'http://' + ipAdd + ':' + portNum
     print("Firing at " + newAddress + " at x=" + x + "&y=" + y)
     payload = {'x':x, 'y':y}
@@ -67,8 +88,10 @@ def handle_board():#populate the board with the contents of opp_board
 def main():
     print ("Processing...")
     opp_board_arr = handle_board()
-    handle_args()       #make sure arguments are valid
-    server_connection() #create connection with server
+    if(not handle_args()):       #make sure arguments are valid
+        sys.exit()
+    else:
+        server_connection() #create connection with server
     print ("End of turn.")
 
 main()

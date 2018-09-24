@@ -94,15 +94,21 @@ class RequestHandler(BaseHTTPRequestHandler):
 def update_board(): #update the board after player move
     numpy.savetxt('own_board.txt', board_arr, fmt='%s')
 
-def handle_board():#populate the board with the contents of own_board
+def handle_board():#populate the board with the contents of own_board.txt
     global board_arr
     with open("own_board.txt") as textFile:
         board_arr = [list(line.rstrip()) for line in textFile]
     return board_arr
 
 def handle_args():#throw error and exit if arguments are incorrect.
-    if (arg_length != 4):
+    if (arg_length != 3):
+        print("Error: invalid arguments. Try: (python3 server.py <PortNumber> <file_name>)")
         return False
+    elif(sys.argv[2] != "own_board.txt"):
+        print("Error: Please invoke program using own_board.txt")
+        return False
+    else:
+        return True
 
 
 def start_server():
@@ -117,6 +123,8 @@ def start_server():
 def main():
     print ("Processing...")
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
+    if not handle_args():
+        sys.exit()
     for x in board_arr:
         print(x)
     start_server()
