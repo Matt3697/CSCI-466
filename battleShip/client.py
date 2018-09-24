@@ -21,32 +21,31 @@ sunk_ships = ['_','_','_','_','_']
 opp_board_arr = [['_' for x in range(10)] for y in range(10)]
 
 def handle_args():
-    search_ip = re.search('[0-9]{3}\.[0-9]\.[0-9]\.[0-9]', sys.argv[1])#search for a formatted ip_address
-    search_ip = str(search_ip)
-    search_portNum = re.search('[0-9]+', sys.argv[2]) #search for a formatted port Number
-    search_portNum = str(search_portNum)
-    search_x = re.search('[0-9]', sys.argv[3])
-    search_x = str(search_x)
-    search_y = re.search('[0-9]', sys.argv[4])
-    search_y = str(search_y)
-
-    print(search_portNum)
     if(len(sys.argv) != 5):
         print ("Error: incorrect arguments. Try python3 server.py <ip_address> <port_number> <xCoordinate> <yCoordinate>")
-    elif(search_ip == 'None'): #'[0-9]{3}\.[0-9]\.\[0-9]\.\[0-9]'), argv[1]):
-        print("Error: Please enter a valid IP address.")
-        return False
-    elif(search_portNum == 'None'):
-        print("Error: Please enter a valid Port Number.")
-        return False
-    elif(search_x == 'None'):
-        print("Error: Please enter a valid X coordinate. (0-9)")
-        return False
-    elif(search_y == 'None'):
-        print("Error: Please enter a valid Y coordinate. (0-9)")
-        return False
     else:
-        return True
+        search_ip = re.search('[0-9]{3}\.[0-9]\.[0-9]\.[0-9]', sys.argv[1])#search for a formatted ip_address
+        search_ip = str(search_ip)
+        search_portNum = re.search('[0-9]+', sys.argv[2]) #search for a formatted port Number
+        search_portNum = str(search_portNum)
+        search_x = re.search('[0-9]', sys.argv[3])
+        search_x = str(search_x)
+        search_y = re.search('[0-9]', sys.argv[4])
+        search_y = str(search_y)
+        if(search_ip == 'None'): #'[0-9]{3}\.[0-9]\.\[0-9]\.\[0-9]'), argv[1]):
+            print("Error: Please enter a valid IP address.")
+            return False
+        elif(search_portNum == 'None'):
+            print("Error: Please enter a valid Port Number.")
+            return False
+        elif(search_x == 'None'):
+            print("Error: Please enter a valid X coordinate. (0-9)")
+            return False
+        elif(search_y == 'None'):
+            print("Error: Please enter a valid Y coordinate. (0-9)")
+            return False
+        else:
+            return True
 
 def reset_board(): #reset the board after a game has finished
     opp_board_arr = [['_' for x in range(10)] for y in range(10)]
@@ -60,6 +59,9 @@ def process_result(reason):
             print("You've hit and sank ship " + sub_reason + "!")
         elif(sub_reason == 'o'):
             print("You've won the game!")
+            opp_board_arr[int(y)][int(x)] = 'X'
+            for i in opp_board_arr:
+                print(i)
             reset_board()
             return
         opp_board_arr[int(y)][int(x)] = 'X'
