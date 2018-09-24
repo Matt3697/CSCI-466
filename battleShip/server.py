@@ -17,8 +17,8 @@ import re
 import codecs
 
 arg_length = len(sys.argv)
-port    = sys.argv[1]
-portNum = int(port)
+portNum    = sys.argv[1]
+
 board_arr = [['_' for x in range(10)] for y in range(10)]
 sunk_ships = []
 
@@ -101,11 +101,17 @@ def handle_board():#populate the board with the contents of own_board.txt
     return board_arr
 
 def handle_args():#throw error and exit if arguments are incorrect.
+    search_portNum = re.search('[0-9]+', sys.argv[1]) #search for a formatted port Number
+    search_portNum = str(search_portNum)
+    search_file = re.search('.*\.txt', sys.argv[2]) #search for a correctly formatted filename
+    search_file = str(search_file)
     if (arg_length != 3):
         print("Error: invalid arguments. Try: (python3 server.py <PortNumber> <file_name>)")
         return False
-    elif(sys.argv[2] != "own_board.txt"):
-        print("Error: Please invoke program using own_board.txt")
+    elif(search_portNum == "None"):
+        print("Error: Please enter a valid Port Number.")
+    elif(search_file == "None"):
+        print("Error: Please invoke program using <File_Name>.txt")
         return False
     else:
         return True
@@ -114,7 +120,7 @@ def handle_args():#throw error and exit if arguments are incorrect.
 def start_server():
     try:
         server_address = ('127.0.0.1', portNum)
-        print("Starting server 127.0.0.1 on port " + port)
+        print("Starting server 127.0.0.1 on port " + portNum)
         httpd = HTTPServer(server_address, RequestHandler)
         httpd.serve_forever()
     except Exception as e:
