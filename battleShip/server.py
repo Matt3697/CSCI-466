@@ -100,7 +100,7 @@ def handle_board():#populate the board with the contents of own_board.txt
         board_arr = [list(line.rstrip()) for line in textFile]
     return board_arr
 
-def handle_args():#throw error and exit if arguments are incorrect.
+def handle_args():#exit program if arguments are incorrect.
     search_portNum = re.search('[0-9]+', sys.argv[1]) #search for a formatted port Number
     search_portNum = str(search_portNum)
     search_file = re.search('.*\.txt', sys.argv[2]) #search for a correctly formatted filename
