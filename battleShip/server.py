@@ -32,7 +32,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     flag = False
         return flag
 
-    def send_result(self, coordinates):
+    def send_result(self, coordinates): #sends results of clients shots back to client
         y = int(coordinates['x'])
         x = int(coordinates['y'])
         if(x >= 10 or y >= 10 or x < 0 or y < 0): #if they fire out of bounds
@@ -61,11 +61,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif(x > 10 or y > 10):#if we hit out of bound return HTTP Not Found
             self.send_response(404)
         else:
-            msg = "Something went very wrong."
+            msg = "Something went very wrong." #if any unexpected errors happen
             self.send_response(400)
         update_board()
 
-    def do_GET(self):
+    def do_GET(self): #allows browser to open own_board and opp_board
         if bool(re.search('own', self.path)):
             f = open('own_board.txt', 'rb')
         else:
@@ -88,13 +88,13 @@ class RequestHandler(BaseHTTPRequestHandler):
     def get_coordinates(self): #extract the data that was sent into an array
         data = self.rfile.read(int(self.headers['Content-Length']))
         coordinates_arr = dict(parse_qsl(data))
-        coordinates = {key.decode(): val.decode() for key, val in coordinates_arr.items()}
-        return coordinates
+        the_coordinates = {key.decode(): val.decode() for key, val in coordinates_arr.items()}
+        return the_coordinates
 
 def update_board(): #update the board after player move
     numpy.savetxt('own_board.txt', board_arr, fmt='%s')
 
-def handle_board():#populate the board with the contents of own_board.txt
+def handle_board():#populate the board with the contents of own_board.txt and opp_board.txt
     global board_arr, board_arr2
     with open("own_board.txt") as textFile:
         board_arr = [list(line.rstrip()) for line in textFile]
@@ -134,13 +134,12 @@ def start_server():
         httpd = HTTPServer(server_address, RequestHandler)
         httpd.serve_forever()
     except Exception as e:
-        print('hi')
         print(str(e))
 
 def main():
     print ("Processing...")
     board_arr = handle_board() #open own_board.txt and populate matrix with contents
-    if not handle_args():
+    if not handle_args(): #exit the program if the arguments aren't correct
         sys.exit()
     start_server()
     print ("End of script.")
