@@ -85,7 +85,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_result(the_coordinates)
         self.end_headers()
 
-    def get_coordinates(self): #extract the data that was sent into an array
+    def get_coordinates(self): #Get the data from the post request
         data = self.rfile.read(int(self.headers['Content-Length']))
         coordinates_arr = dict(parse_qsl(data))
         the_coordinates = {key.decode(): val.decode() for key, val in coordinates_arr.items()}
