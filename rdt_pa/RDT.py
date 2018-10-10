@@ -10,10 +10,12 @@ class Packet:
     length_S_length = 10
     # length of md5 checksum in hex
     checksum_length = 32
+    # type of Packet
 
-    def __init__(self, seq_num, msg_S):
+    def __init__(self, seq_num, msg_S, type=None):
         self.seq_num = seq_num
         self.msg_S = msg_S
+        self.type = type
 
     @classmethod
     def from_byte_S(self, byte_S):
@@ -97,6 +99,9 @@ class RDT:
         # resends data following a NAK
 
     def rdt_2_1_send(self, msg_S):
+        # acknowledgement packet
+
+        self.network.udt_send
         pass
 
     def rdt_2_1_receive(self):
