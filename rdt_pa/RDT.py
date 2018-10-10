@@ -12,10 +12,9 @@ class Packet:
     checksum_length = 32
     # type of Packet
 
-    def __init__(self, seq_num, msg_S, type=None):
+    def __init__(self, seq_num, msg_S):
         self.seq_num = seq_num
         self.msg_S = msg_S
-        self.type = type
 
     @classmethod
     def from_byte_S(self, byte_S):
@@ -98,19 +97,19 @@ class RDT:
         # uses modified Packet class to send NAKs for corrupt packets
         # resends data following a NAK
 
-    def rdt_2_1_send(self, msg_S, type=None):
+    def rdt_2_1_send(self, msg_S):
         # acknowledgement packet
         # receive ACK before sending next packet
         # if NAK send duplicate packet
         # 0 - new packet 1 - retransmission
 
-        p = Packet(self.seq_num, msg_S, type)
+        p = Packet(self.seq_num, msg_S)
         while True:
             self.network.udt_send(p.get_byte_S())
             r = None
             while r == None:
-                r = self.rdt_2_1_receive()
-            if r.type != 'N':
+                r = self.rdt_1_0_receive()
+            if r != "N":
                 return
         pass
 
@@ -118,17 +117,17 @@ class RDT:
         ret_S = None
         byte_S = self.network.udt_receive()
         self.byte_buffer += byte_S
+        if Packet.corrupt(byte_S):
+            # send NAK
+            nak = Packet(self.seq_num, "N")
+            self.network.udt_send(nak.get_byte_S())
+            r = None
+            while r is None:
+                r = self.network.udt_receive()
+            # response to nak is duplicate of last packet
+            byte_S = r
         # keep extracting packets - if reordered, could get more than one
         while True:
-            if Packet.corrupt(byte_S):
-                # send NAK
-                nak = Packet(self.seq_num, "", 'N')
-                self.network.udt_send(nak.get_byte_S())
-                r = None
-                while r is None:
-                    r = self.network.udt_receive()
-                # response to nak is duplicate of last packet
-                byte_S = r
             # check if we have received enough bytes
             if(len(self.byte_buffer) < Packet.length_S_length):
                 # not enough bytes to read packet length

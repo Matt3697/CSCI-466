@@ -32,10 +32,10 @@ if __name__ == '__main__':
 
         msg_S = None
         while msg_S is None:
-            msg_S = rdt.rdt_1_0_receive()
+            # msg_S = rdt.rdt_1_0_receive()
 
             # TODO implement other RDT .receive()
-            # msg_S = rdt.rdt_2_1_receive()
+            msg_S = rdt.rdt_2_1_receive()
             # msg_S = rdt.rdt_3_0_receive()
 
             if msg_S is None:
