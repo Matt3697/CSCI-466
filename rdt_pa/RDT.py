@@ -119,9 +119,12 @@ class RDT:
         byte_S = self.network.udt_receive()
         if Packet.corrupt(byte_S):
             # send NAK
-            nak = None
-            while True
-                nak = self.rdt_2_1_send(self, "", 'N')
+            r = None
+            while r == None:
+                nak = Packet(self.seq_num, "", 'N')
+                self.network.udt_send(nak.get_byte_S)
+                while r == None:
+                    r = self.network.udt_receive()
         self.byte_buffer += byte_S
         # keep extracting packets - if reordered, could get more than one
         while True:
