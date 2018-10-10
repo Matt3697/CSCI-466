@@ -100,9 +100,16 @@ class RDT:
 
     def rdt_2_1_send(self, msg_S, type):
         # acknowledgement packet
+        # receive ACK before sending next packet
+        # if NAK send duplicate packet
+        # 0 - new packet 1 - retransmission
+
         p = Packet(self.seq_num, msg_S, type)
-        self.seq_num += 1
-        self.network.udt_send(p.get_byte_S())
+        while True:
+            self.network.udt_send(p.get_byte_S())
+            r = self.rdt_2_1_receive(self)
+            if r.type != 'N':
+                return
         pass
 
     def rdt_2_1_receive(self):
@@ -110,7 +117,22 @@ class RDT:
         byte_S = self.network.udt_receive()
         self.byte_buffer += byte_S
         # keep extracting packets - if reordered, could get more than one
-        self.rdt_1_0_receive(self)
+        while True:
+            # check if we have received enough bytes
+            if(len(self.byte_buffer) < Packet.length_S_length):
+                # not enough bytes to read packet length
+                return ret_S
+            # extract length of packet
+            length = int(self.byte_buffer[:Packet.length_S_length])
+            if len(self.byte_buffer) < length:
+                # not enough bytes to read the whole packet
+                return ret_S
+            # create packet from buffer content and add to return string
+            p = Packet.from_byte_S(self.byte_buffer[0:length])
+            ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
+            # remove the packet bytes from the buffer
+            self.byte_buffer = self.byte_buffer[length:]
+            # if this was the last packet, will return on the next iteration
         pass
 
     # rdt3.0 has the following features:
