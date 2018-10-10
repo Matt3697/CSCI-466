@@ -124,6 +124,7 @@ class RDT:
             r = None
             while r is None:
                 r = self.network.udt_receive()
+            # response to nak is duplicate of last packet
         self.byte_buffer += byte_S
         # keep extracting packets - if reordered, could get more than one
         while True:
