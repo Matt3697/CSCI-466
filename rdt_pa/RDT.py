@@ -117,22 +117,22 @@ class RDT:
     def rdt_2_1_receive(self):
         ret_S = None
         byte_S = self.network.udt_receive()
-        if Packet.corrupt(byte_S):
-            # send NAK
-            nak = Packet(self.seq_num, "", 'N')
-            self.network.udt_send(nak.get_byte_S)
-            r = None
-            while r is None:
-                r = self.network.udt_receive()
-            # response to nak is duplicate of last packet
         self.byte_buffer += byte_S
         # keep extracting packets - if reordered, could get more than one
         while True:
+            if Packet.corrupt(byte_S):
+                # send NAK
+                nak = Packet(self.seq_num, "", 'N')
+                self.network.udt_send(nak.get_byte_S)
+                r = None
+                while r is None:
+                    r = self.network.udt_receive()
+                # response to nak is duplicate of last packet
+                byte_S = r
             # check if we have received enough bytes
             if(len(self.byte_buffer) < Packet.length_S_length):
                 # not enough bytes to read packet length
                 return ret_S
-            if()
             # extract length of packet
             length = int(self.byte_buffer[:Packet.length_S_length])
             if len(self.byte_buffer) < length:
