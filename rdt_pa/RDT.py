@@ -107,7 +107,9 @@ class RDT:
         p = Packet(self.seq_num, msg_S, type)
         while True:
             self.network.udt_send(p.get_byte_S())
-            r = self.rdt_2_1_receive(self)
+            r = None
+            while r == None:
+                r = self.rdt_2_1_receive()
             if r.type != 'N':
                 return
         pass
