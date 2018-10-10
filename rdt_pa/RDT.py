@@ -98,10 +98,11 @@ class RDT:
         # uses modified Packet class to send NAKs for corrupt packets
         # resends data following a NAK
 
-    def rdt_2_1_send(self, msg_S):
+    def rdt_2_1_send(self, msg_S, type):
         # acknowledgement packet
-
-        self.network.udt_send
+        p = Packet(self.seq_num, msg_S, type)
+        self.seq_num += 1
+        self.network.udt_send(p.get_byte_S())
         pass
 
     def rdt_2_1_receive(self):
