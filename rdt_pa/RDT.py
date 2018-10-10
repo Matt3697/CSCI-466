@@ -106,6 +106,11 @@ class RDT:
         pass
 
     def rdt_2_1_receive(self):
+        ret_S = None
+        byte_S = self.network.udt_receive()
+        self.byte_buffer += byte_S
+        # keep extracting packets - if reordered, could get more than one
+        self.rdt_1_0_receive(self)
         pass
 
     # rdt3.0 has the following features:
@@ -122,6 +127,8 @@ class RDT:
     def rdt_3_0_receive(self):
         pass
 
+    def corrupt():
+        pass
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='RDT implementation.')
