@@ -108,7 +108,7 @@ class RDT:
             self.network.udt_send(p.get_byte_S())
             r = None
             while r == None:
-                r = self.rdt_1_0_receive()
+                r = self.rdt_1_0_receive() #Should this be rdt_2_0?
             if r != "N":
                 return
         pass
@@ -154,9 +154,29 @@ class RDT:
         # ignores a duplicate packet after a premature timeout (or after a lost ACK)
 
     def rdt_3_0_send(self, msg_S):
+        # acknowledgement packet
+        # receive ACK before sending next packet
+        # if NAK send duplicate packet
+        # 0 - new packet 1 - retransmission
+        # handle packet loss: Sender waits reasonable amount of time, retransmit if no ACK received in this time.
+        p = Packet(self.seq_num, msg_S)
+        timeout = 2
+        while True:
+            time_of_last_data = time.time()
+            self.network.udt_send(p.get_byte_S())
+            r = None
+            while r == None:
+                r = self.rdt_2_0_receive()
+            if r != "N":
+                return
+            elif time_of_last_data + timeout < time.time():
+                return
         pass
 
     def rdt_3_0_receive(self):
+        #ignore duplicate packets
+        #receiver specifies seq_num of ACKed packet
+
         pass
 
     def corrupt():
