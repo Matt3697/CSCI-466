@@ -99,27 +99,33 @@ class RDT:
         # resends data following a NAK
 
     def rdt_2_1_send(self, msg_S):
-        p = Packet(self.seq_num, msg_S)
-        self.seq_num += 1
-        self.network.udt_send(p.get_byte_S())
-        response_byte_S = self.network.udt_receive()
-        self.byte_buffer += response_byte_S
-
         while True:
-            if(len(self.byte_buffer) < Packet.length_S_length):
-                return
-            length = int(self.byte_buffer[:Packet.length_S_length])
-            if len(self.byte_buffer) < length:
-                return
+            # create a packet
+            p = Packet(self.seq_num, msg_S)
+            self.seq_num += 1
+            # send to receiver over udt
+            self.network.udt_send(p.get_byte_S())
+
+            # try to get response from receiver
+            response_byte_S = self.network.udt_receive()
+            self.byte_buffer += response_byte_S
+
+            # keep receiving packets
+            while True:
+                if(len(self.byte_buffer) < Packet.length_S_length):
+                    break
+                length = int(self.byte_buffer[:Packet.length_S_length])
+                if len(self.byte_buffer) < length:
+                    break
+
             p = Packet.from_byte_S(self.byte_buffer[0:length])
-            # if response is an acknowledgement
-            if p.ack == "ACK":
-                print("")
-            # if response is a negative acknowledgement
-            elif p.ack == "NAK":
-                print("")
-
-
+            # if receiver response is a "NAK"
+            if p.nak == "NAK":
+                continue
+            # else if receiver response is an "ACK"
+            elif p.nak == "ACK":
+                break
+            # else (???)
         pass
 
     def rdt_2_1_receive(self):
