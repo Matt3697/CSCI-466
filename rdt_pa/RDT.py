@@ -12,16 +12,17 @@ class Packet:
     checksum_length = 32
     # type of Packet
 
-    def __init__(self, seq_num, msg_S):
+    def __init__(self, seq_num, msg_S, ack=None):
         self.seq_num = seq_num
         self.msg_S = msg_S
+        self.ack = ack
 
     @classmethod
     def from_byte_S(self, byte_S):
         if Packet.corrupt(byte_S):
             raise RuntimeError('Cannot initialize Packet: byte_S is corrupt')
         # extract the fields
-        seq_num = int(byte_S[Packet.length_S_length : Packet.length_S_length+Packet.seq_num_S_length])
+        seq_num = int(byte_S[Packet.length_S_length: Packet.length_S_length+Packet.seq_num_S_length])
         msg_S = byte_S[Packet.length_S_length+Packet.seq_num_S_length+Packet.checksum_length :]
         return self(seq_num, msg_S)
 
@@ -98,19 +99,34 @@ class RDT:
         # resends data following a NAK
 
     def rdt_2_1_send(self, msg_S):
-        # acknowledgement packet
-        # receive ACK before sending next packet
-        # if NAK send duplicate packet
-        # 0 - new packet 1 - retransmission
-
-        p = Packet(self.seq_num, msg_S)
         while True:
+            # create a packet
+            p = Packet(self.seq_num, msg_S)
+            self.seq_num += 1
+            # send to receiver over udt
             self.network.udt_send(p.get_byte_S())
-            r = None
-            while r == None:
-                r = self.rdt_1_0_receive() #Should this be rdt_2_0?
-            if r != "N":
-                return
+
+
+            # try to get response from receiver
+            response_byte_S = self.network.udt_receive()
+            self.byte_buffer += response_byte_S
+
+            # keep receiving packets
+            while True:
+                if(len(self.byte_buffer) < Packet.length_S_length):
+                    break
+                length = int(self.byte_buffer[:Packet.length_S_length])
+                if len(self.byte_buffer) < length:
+                    break
+
+            p = Packet.from_byte_S(self.byte_buffer[0:length])
+            # if receiver response is a "NAK"
+            if p.nak == "NAK":
+                continue
+            # else if receiver response is an "ACK"
+            elif p.nak == "ACK":
+                break
+            # else (???)
         pass
 
     def rdt_2_1_receive(self):
