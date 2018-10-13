@@ -20,9 +20,10 @@ if __name__ == '__main__':
 
     rdt = RDT.RDT('client', args.server, args.port)
     for msg_S in msg_L:
-        print('Converting using RDT1.0: '+msg_S)
-        rdt.rdt_1_0_send(msg_S)
-
+        #print('Converting using RDT1.0: '+msg_S)
+        #rdt.rdt_1_0_send(msg_S)
+        print('Converting using RDT2.1: '+msg_S)
+        rdt.rdt_2_1_send(msg_S)
         # TODO Implement other RDT .send()
         # print('Converting using RDT2.1: '+msg_S)
         # rdt.rdt_2_1_send(msg_S)
@@ -32,8 +33,8 @@ if __name__ == '__main__':
 
         msg_S = None
         while msg_S is None:
-            msg_S = rdt.rdt_1_0_receive()
-
+            #msg_S = rdt.rdt_1_0_receive()
+            msg_S = rdt.rdt_2_1_receive()
             # TODO implement other RDT .receive()
             # msg_S = rdt.rdt_2_1_receive()
             # msg_S = rdt.rdt_3_0_receive()
