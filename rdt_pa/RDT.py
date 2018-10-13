@@ -100,21 +100,27 @@ class RDT:
         p = Packet(self.seq_num, msg_S)
         while True:
             r = ""
-            # send to receiver using udt
+            # send to receiver over udt
             self.network.udt_send(p.get_byte_S())
-            # get response from receiver
+
+            # try to get response from receiver
             while(r == ""):
                 r = self.network.udt_receive()
-            # extract info from response
+            # extract information from response
             length = int(r[:Packet.length_S_length])
             packet_info = Packet.from_byte_S(r[:length])
             response = packet_info.msg_S
             print(response + '<--- MESSAGE')
             # check type of response
             if(self.isNAK(response)):
+                print("NAK received.")
             elif(self.isACK(response)):
+                print("ACK received.")
                 self.seq_num += 1
                 break
+            else:
+                print("Nak or Ack corrupt.")
+
 
     def rdt_2_1_receive(self):#
         ret_S = None
@@ -133,15 +139,19 @@ class RDT:
                 return ret_S
             # check if the packet is corrupted
             if(self.isCorrupted(self.byte_buffer)):
+                print("The Packet is corrupt.")
                 nak = Packet(self.seq_num, "0") #send which packet is corrupted
                 self.network.udt_send(nak.get_byte_S())
                 break
 
             else:
-                #extract the data from the packet
+                #extract the data from the packet and put into ret_S
                 p = Packet.from_byte_S(self.byte_buffer[0:length])
-                nak = Packet(self.seq_num, "1") #send corrupt packet
+
+                print("The Packet is correct.")
+                nak = Packet(self.seq_num, "1") #send which packet is corrupted
                 self.network.udt_send(nak.get_byte_S())
+
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
                 #remove the packet bytes from the buffer
                 self.byte_buffer = self.byte_buffer[length:]
