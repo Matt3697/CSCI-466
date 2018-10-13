@@ -110,7 +110,8 @@ class RDT:
             length = int(r[:Packet.length_S_length])
             packet_info = Packet.from_byte_S(r[:length])
             response = packet_info.msg_S
-            print(response + '<--- MESSAGE')
+            print(response + ' <--- MESSAGE')
+            response = int(response)
             # check type of response
             if(self.isNAK(response)):
                 print("NAK received.")
