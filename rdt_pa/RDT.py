@@ -100,13 +100,12 @@ class RDT:
         p = Packet(self.seq_num, msg_S)
         while True:
             r = ""
-            # send to receiver over udt
+            # send to receiver using udt
             self.network.udt_send(p.get_byte_S())
-
-            # try to get response from receiver
+            # get response from receiver
             while(r == ""):
                 r = self.network.udt_receive()
-            # extract information from response
+            # extract info from response
             length = int(r[:Packet.length_S_length])
             packet_info = Packet.from_byte_S(r[:length])
             response = packet_info.msg_S
@@ -139,9 +138,9 @@ class RDT:
                 break
 
             else:
-                #extract the data from the packet and put into ret_S
+                #extract the data from the packet
                 p = Packet.from_byte_S(self.byte_buffer[0:length])
-                nak = Packet(self.seq_num, "1") #send which packet is corrupted
+                nak = Packet(self.seq_num, "1") #send corrupt packet
                 self.network.udt_send(nak.get_byte_S())
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
                 #remove the packet bytes from the buffer
