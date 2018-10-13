@@ -98,6 +98,7 @@ class RDT:
 
     def rdt_2_1_send(self, msg_S):
         p = Packet(self.seq_num, msg_S)
+        i = 0
         while True:
             r = ""
             # send to receiver over udt
@@ -107,6 +108,8 @@ class RDT:
             while(r == ""):
                 r = self.network.udt_receive()
             # extract information from response
+            print(i)
+            i = i + 1
             length = int(r[:Packet.length_S_length])
             packet_info = Packet.from_byte_S(r[:length])
             response = packet_info.msg_S
@@ -119,7 +122,7 @@ class RDT:
             elif(self.isACK(response)):
                 print("ACK received.")
                 self.seq_num += 1
-                break
+
             else:
                 print("Nak or Ack corrupt.")
 
@@ -151,8 +154,8 @@ class RDT:
                 p = Packet.from_byte_S(self.byte_buffer[0:length])
 
                 print("The Packet is correct.")
-                nak = Packet(self.seq_num, "1") #send which packet is corrupted
-                self.network.udt_send(nak.get_byte_S())
+                ack = Packet(self.seq_num, "1")
+                self.network.udt_send(ack.get_byte_S())
 
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
                 #remove the packet bytes from the buffer

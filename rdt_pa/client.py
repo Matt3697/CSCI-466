@@ -17,9 +17,10 @@ if __name__ == '__main__':
     # send the next message if no response
     timeout = 2
     time_of_last_data = time.time()
-
+    i = 0
     rdt = RDT.RDT('client', args.server, args.port)
     for msg_S in msg_L:
+        print(i)
         #print('Converting using RDT1.0: '+msg_S)
         #rdt.rdt_1_0_send(msg_S)
         print('Converting using RDT2.1: '+msg_S)
