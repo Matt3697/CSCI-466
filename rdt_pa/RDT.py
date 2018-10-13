@@ -103,7 +103,7 @@ class RDT:
             # send to receiver over udt
             self.network.udt_send(p.get_byte_S())
 
-            # try to get response from receiver
+            # try to get nak/ack response from receiver
             while(r == ""):
                 r = self.network.udt_receive()
             # extract information from response
