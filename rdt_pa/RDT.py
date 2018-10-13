@@ -115,6 +115,7 @@ class RDT:
             # check type of response
             if(self.isNAK(response)):
                 print("NAK received.")
+            #increase the seq_num if an ack is recieved
             elif(self.isACK(response)):
                 print("ACK received.")
                 self.seq_num += 1
@@ -138,7 +139,7 @@ class RDT:
             if len(self.byte_buffer) < length:
                 # not enough bytes to read the whole packet
                 return ret_S
-            # check if the packet is corrupted
+            # check if packet is corrupt
             if(self.isCorrupted(self.byte_buffer)):
                 print("The Packet is corrupt.")
                 nak = Packet(self.seq_num, "0") #send which packet is corrupted
@@ -171,7 +172,6 @@ class RDT:
         # acknowledgement packet
         # receive ACK before sending next packet
         # if NAK send duplicate packet
-        # 0 - new packet 1 - retransmission
         # handle packet loss: Sender waits reasonable amount of time, retransmit if no ACK received in this time.
         p = Packet(self.seq_num, msg_S)
         timeout = 2
@@ -185,33 +185,27 @@ class RDT:
                 return
             elif time_of_last_data + timeout < time.time():
                 return
-        pass
 
     def rdt_3_0_receive(self):
         #ignore duplicate packets
         #receiver specifies seq_num of ACKed packet
-
         pass
 
-    def corrupt():
-        pass
-
- # check if the packet contains a NAK response
+    # check if packet contains a NAK
     def isNAK(self, response):
         if(response == 0):
             return True
         else:
             return False
 
-    # check if the packet contains an ACK response
+    # check if packet contains an ACK
     def isACK(self, response):
         if(response == 1):
-            print("yo")
             return True
         else:
             return False
 
-    # check if the packet is corrupted
+    # check if packet is corrupt
     def isCorrupted(self, packet):
         if(Packet.corrupt(packet)):
             return True
