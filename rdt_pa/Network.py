@@ -53,17 +53,17 @@ class NetworkLayer:
         if self.conn is not None: self.conn.close()
 
     def udt_send(self, msg_S):
-        #return without sending if the packet is being dropped
+        # return without sending if the packet is being dropped
         if random.random() < self.prob_pkt_loss:
             return
-        #corrupt a packet
+        # corrupt a packet
         if random.random() < self.prob_byte_corr:
             start = random.randint(RDT.Packet.length_S_length,len(msg_S)-5) #make sure we are not corrupting the length field,
                                                                             #since that makes life really difficult
             num = random.randint(1,5)
             repl_S = ''.join(random.sample('XXXXX', num)) #sample length >= num
             msg_S = msg_S[:start]+repl_S+msg_S[start+num:]
-        #reorder packets - either hold a packet back, or if one held back then send both
+        # reorder packets - either hold a packet back, or if one held back then send both
         if random.random() < self.prob_pkt_reorder or self.reorder_msg_S:
             if self.reorder_msg_S is None:
                 self.reorder_msg_S = msg_S
@@ -72,7 +72,7 @@ class NetworkLayer:
                 msg_S += self.reorder_msg_S
                 self.reorder_msg_S = None
 
-        #keep calling send until all the bytes are transferred
+        # keep calling send until all the bytes are transferred
         totalsent = 0
         while totalsent < len(msg_S):
             sent = self.conn.send(msg_S[totalsent:].encode('utf-8'))

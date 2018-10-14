@@ -1,5 +1,6 @@
 import Network
 import argparse
+import time
 from time import sleep
 import hashlib
 import sys
@@ -97,7 +98,30 @@ class RDT:
 
     def rdt_2_1_send(self, msg_S):
         p = Packet(self.seq_num, msg_S)
-        self.network.udt_send(p.get_byte_S())
+        byte_s = p.get_byte_S()
+        #print('Sending Packet')
+        while True:
+            self.network.udt_send(byte_s)
+            # wait for ACK or NAK
+
+            pack_ack = self.receive_packet()
+			# Break if successfully sent, otherwise retry
+
+            corrupt = Packet.corrupt(pack_ack.get_byte_S())
+
+            print(pack_ack.msg_S)
+
+            if not corrupt and pack_ack.msg_S == 'ACK':
+                self.seq_num = 1 - self.seq_num
+                #print('Packet successfully sent')
+
+                break
+			# self.byte_buffer = ''
+
+
+        '''
+        p = Packet(self.seq_num, msg_S)
+        i = 0
         while True:
             # send to receiver over udt
             # try to get nak/ack response from receiver
@@ -129,9 +153,28 @@ class RDT:
                 break
             else:
                 print("Nak or Ack corrupt.")
+            '''
 
+    def rdt_2_1_receive(self):
+        resp = Packet(self.seq_num, 'ACK')
+        self.network.udt_send(resp.get_byte_S())
+        p = self.receive_packet()
+        corrupt = Packet.corrupt(p.get_byte_S())
 
-    def rdt_2_1_receive(self):#
+        if not corrupt and p.seq_num == self.seq_num:
+            #print('Sending ACK')
+            resp = Packet(self.seq_num, 'ACK')
+            self.network.udt_send(resp.get_byte_S())
+            self.seq_num = 1 - self.seq_num
+            return p.msg_S
+
+        else:
+            #print('Sending NAK')
+            resp = Packet(self.seq_num, 'NAK')
+            self.network.udt_send(resp.get_byte_S())
+            return self.rdt_2_1_receive()
+
+        '''
         ret_S = None
         byte_S = self.network.udt_receive()
         self.byte_buffer += byte_S
@@ -166,7 +209,7 @@ class RDT:
                 self.byte_buffer = self.byte_buffer[length:]
                 #if this was the last packet, will return on the next iteration
 
-
+    '''
     # rdt3.0 has the following features:
         # delivers data under no corruption or loss in the network and uses a modified Packet class to send ACKs
         # does not deliver corrupt packets and uses modified Packet class to send NAKs
@@ -176,22 +219,29 @@ class RDT:
         # ignores a duplicate packet after a premature timeout (or after a lost ACK)
 
     def rdt_3_0_send(self, msg_S):
-        # acknowledgement packet
-        # receive ACK before sending next packet
-        # if NAK send duplicate packet
-        # handle packet loss: Sender waits reasonable amount of time, retransmit if no ACK received in this time.
+        self.seq_num = 1 - self.seq_num
         p = Packet(self.seq_num, msg_S)
-        timeout = 2
+        byte_s = p.get_byte_S()
         while True:
-            time_of_last_data = time.time()
-            self.network.udt_send(p.get_byte_S())
-            r = None
-            while r == None:
-                r = self.rdt_2_0_receive()
-            if r != "N":
-                return
-            elif time_of_last_data + timeout < time.time():
-                return
+        	print('Sending Packet')
+        	self.network.udt_send(byte_s)
+
+        	# wait for ACK or NAK
+        	ack = ''
+        	time_wait = time.time()
+        	while ack == '' and time.time() - time_wait > 1:
+        		ack = self.network.udt_receive()
+        	# Get packet from bytes and check if corrupt
+        	corrupt = False
+        	try:
+        		pack_ack = from_bytes_S(ack)
+        	except RuntimeError:
+        		print('Corrupt ACK or NAK. Attempting Transmission again...')
+        		corrupt = True
+        	# Break if successfully sent, otherwise retry
+        	if ack != '' and not corrupt and pack_ack.seq_num == seq_num and pack_ack.msg_S == 'ACK':
+        		print('Packet successfully sent')
+        		return
 
     def rdt_3_0_receive(self):
         #ignore duplicate packets
@@ -218,6 +268,27 @@ class RDT:
             return True
         else:
             return False
+
+    def receive_packet(self):
+    	#print('Receiving Packet')
+    	while True:
+    		p = None
+    		byte_S = self.network.udt_receive()
+    		self.byte_buffer += byte_S
+
+    		if(len(self.byte_buffer) >= Packet.length_S_length):
+    			#extract length of packet
+    			length = int(self.byte_buffer[:Packet.length_S_length])
+    			if len(self.byte_buffer) >= length:
+    				# Checks if packet received is corrupt
+    				try:
+    					p = Packet.from_byte_S(self.byte_buffer[:length])
+    					self.byte_buffer = self.byte_buffer[length:]
+    				except RuntimeError:
+    					#print('corrupt packet')
+    					self.byte_buffer = self.byte_buffer[length:]
+    		if p != None:
+    			return p
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='RDT implementation.')
