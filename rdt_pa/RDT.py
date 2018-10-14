@@ -1,5 +1,6 @@
 import Network
 import argparse
+import time
 from time import sleep
 import hashlib
 import sys
@@ -99,7 +100,7 @@ class RDT:
     def rdt_2_1_send(self, msg_S):
         p = Packet(self.seq_num, msg_S)
         byte_s = p.get_byte_S()
-        print('Sending Packet')
+        #print('Sending Packet')
         while True:
             self.network.udt_send(byte_s)
             # wait for ACK or NAK
@@ -113,7 +114,7 @@ class RDT:
 
             if not corrupt and pack_ack.msg_S == 'ACK':
                 self.seq_num = 1 - self.seq_num
-                print('Packet successfully sent')
+                #print('Packet successfully sent')
 
                 break
 			# self.byte_buffer = ''
@@ -157,14 +158,14 @@ class RDT:
         corrupt = Packet.corrupt(p.get_byte_S())
 
         if not corrupt and p.seq_num == self.seq_num:
-            print('Sending ACK')
+            #print('Sending ACK')
             resp = Packet(self.seq_num, 'ACK')
             self.network.udt_send(resp.get_byte_S())
             self.seq_num = 1 - self.seq_num
             return p.msg_S
 
         else:
-            print('Sending NAK')
+            #print('Sending NAK')
             resp = Packet(self.seq_num, 'NAK')
             self.network.udt_send(resp.get_byte_S())
             return self.rdt_2_1_receive()
@@ -265,7 +266,7 @@ class RDT:
             return False
 
     def receive_packet(self):
-    	print('Receiving Packet')
+    	#print('Receiving Packet')
     	while True:
     		p = None
     		byte_S = self.network.udt_receive()
