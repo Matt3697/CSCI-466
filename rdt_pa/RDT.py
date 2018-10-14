@@ -11,7 +11,6 @@ class Packet:
     length_S_length = 10
     # length of md5 checksum in hex
     checksum_length = 32
-    # type of Packet
 
     def __init__(self, seq_num, msg_S, ack=None):
         self.seq_num = seq_num
@@ -124,29 +123,34 @@ class RDT:
         p = Packet(self.seq_num, msg_S)
         i = 0
         while True:
-            r = ""
             # send to receiver over udt
-            self.network.udt_send(p.get_byte_S())
-
             # try to get nak/ack response from receiver
-            while(r == ""):
-                r = self.network.udt_receive()
-            # extract information from response
-            print(i)
-            i = i + 1
-            length = int(r[:Packet.length_S_length])
-            packet_info = Packet.from_byte_S(r[:length])
-            response = packet_info.msg_S
-            print(response + ' <--- MESSAGE')
-            response = int(response)
+            r = self.network.udt_receive()
+            while True:
+                #check if we have received enough bytes
+                if(len(self.byte_buffer) < Packet.length_S_length):
+                    break #not enough bytes to read packet length
+                #extract length of packet
+                length = int(self.byte_buffer[:Packet.length_S_length])
+                if len(self.byte_buffer) < length:
+                    break #not enough bytes to read the whole packet
+                #create packet from buffer content
+                r = Packet.from_byte_S(self.byte_buffer[0:length])
+                #remove the packet bytes from the buffer
+                self.byte_buffer = self.byte_buffer[length:]
+                #if this was the last packet, will return on the next iteration
+            print(r)
+            # response = int(response)
             # check type of response
-            if(self.isNAK(response)):
+            if r.ack == "NAK":
                 print("NAK received.")
+                self.network.udt_send(p.get_byte_S())
+                continue
             #increase the seq_num if an ack is recieved
-            elif(self.isACK(response)):
+            elif r.ack == "ACK":
                 print("ACK received.")
                 self.seq_num += 1
-
+                break
             else:
                 print("Nak or Ack corrupt.")
             '''
@@ -188,7 +192,7 @@ class RDT:
             # check if packet is corrupt
             if(self.isCorrupted(self.byte_buffer)):
                 print("The Packet is corrupt.")
-                nak = Packet(self.seq_num, "0") #send which packet is corrupted
+                nak = Packet(self.seq_num, "0", "NAK") #send which packet is corrupted
                 self.network.udt_send(nak.get_byte_S())
                 break
 
@@ -197,7 +201,7 @@ class RDT:
                 p = Packet.from_byte_S(self.byte_buffer[0:length])
 
                 print("The Packet is correct.")
-                ack = Packet(self.seq_num, "1")
+                ack = Packet(self.seq_num, "1", "ACK")
                 self.network.udt_send(ack.get_byte_S())
 
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
@@ -246,7 +250,7 @@ class RDT:
 
     # check if packet contains a NAK
     def isNAK(self, response):
-        if(response == 0):
+        if response is "NAK":
             return True
         else:
             return False
