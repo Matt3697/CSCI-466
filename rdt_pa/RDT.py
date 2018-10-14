@@ -246,7 +246,24 @@ class RDT:
     def rdt_3_0_receive(self):
         #ignore duplicate packets
         #receiver specifies seq_num of ACKed packet
-        pass
+        resp = Packet(self.seq_num, 'ACK')
+        self.network.udt_send(resp.get_byte_S())
+        p = self.receive_packet()
+        corrupt = Packet.corrupt(p.get_byte_S())
+
+        if not corrupt and p.seq_num == self.seq_num:
+            #print('Sending ACK')
+            resp = Packet(self.seq_num, 'ACK')
+            self.network.udt_send(resp.get_byte_S())
+            self.seq_num = 1 - self.seq_num
+            return p.msg_S
+
+        else:
+            #print('Sending NAK')
+            resp = Packet(self.seq_num, 'NAK')
+            self.network.udt_send(resp.get_byte_S())
+            return self.rdt_3_0_receive()
+
 
     # check if packet contains a NAK
     def isNAK(self, response):
