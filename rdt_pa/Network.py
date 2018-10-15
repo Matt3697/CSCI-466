@@ -51,7 +51,7 @@ class NetworkLayer:
     def __del__(self):
         if self.sock is not None: self.sock.close()
         if self.conn is not None: self.conn.close()
-
+    
     def udt_send(self, msg_S):
         # return without sending if the packet is being dropped
         if random.random() < self.prob_pkt_loss:

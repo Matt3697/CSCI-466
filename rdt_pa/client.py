@@ -24,6 +24,7 @@ if __name__ == '__main__':
         print('Converting using RDT1.0: '+msg_S)
         rdt.rdt_1_0_send(msg_S)
         '''
+        '''
         print('Converting using RDT2.1: '+msg_S)
         rdt.rdt_2_1_send(msg_S)
         # TODO Implement other RDT .send()
@@ -31,12 +32,12 @@ if __name__ == '__main__':
         print('Converting using RDT3.0: '+msg_S)
         rdt.rdt_3_0_send(msg_S)
         # try to receive message before timeout
-        '''
+
         msg_S = None
         while msg_S is None:
             #msg_S = rdt.rdt_1_0_receive()
-            msg_S = rdt.rdt_2_1_receive()
-            #msg_S = rdt.rdt_3_0_receive()
+            #msg_S = rdt.rdt_2_1_receive()
+            msg_S = rdt.rdt_3_0_receive()
 
             if msg_S is None:
                 if time_of_last_data + timeout < time.time():
