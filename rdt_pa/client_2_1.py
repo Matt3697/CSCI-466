@@ -1,5 +1,5 @@
 import argparse
-import RDT
+import rdt_2_1
 import time
 
 if __name__ == '__main__':
@@ -18,26 +18,15 @@ if __name__ == '__main__':
     timeout = 2
     time_of_last_data = time.time()
     i = 0
-    rdt = RDT.RDT('client', args.server, args.port)
+    rdt = rdt_2_1.RDT_2_1('client', args.server, args.port)
     for msg_S in msg_L:
-        '''
-        print('Converting using RDT1.0: '+msg_S)
-        rdt.rdt_1_0_send(msg_S)
-        '''
+
         print('Converting using RDT2.1: '+msg_S)
         rdt.rdt_2_1_send(msg_S)
-        # TODO Implement other RDT .send()
-        '''
-        print('Converting using RDT3.0: '+msg_S)
-        rdt.rdt_3_0_send(msg_S)
-        # try to receive message before timeout
-        '''
 
         msg_S = None
         while msg_S is None:
-            #msg_S = rdt.rdt_1_0_receive()
             msg_S = rdt.rdt_2_1_receive()
-            #msg_S = rdt.rdt_3_0_receive()
 
             if msg_S is None:
                 if time_of_last_data + timeout < time.time():

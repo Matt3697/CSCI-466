@@ -1,5 +1,5 @@
 import argparse
-import RDT
+import rdt_2_1
 import time
 
 
@@ -35,12 +35,10 @@ if __name__ == '__main__':
     timeout = 5
 
     time_of_last_data = time.time()
-    rdt = RDT.RDT('server', None, args.port)
+    rdt = rdt_2_1.RDT_2_1('server', None, args.port)
     while(True):
         # try to receiver message before timeout
-        #msg_S = rdt.rdt_1_0_receive()
         msg_S = rdt.rdt_2_1_receive()
-        #msg_S = rdt.rdt_3_0_receive()
 
 
         if msg_S is None:
@@ -53,8 +51,6 @@ if __name__ == '__main__':
         rep_msg_S = piglatinize(msg_S)
         print('Converted %s \nto \n%s\n' % (msg_S, rep_msg_S))
         # convert and reply
-        #rdt.rdt_1_0_send(rep_msg_S)
         rdt.rdt_2_1_send(rep_msg_S)
-        #rdt.rdt_3_0_send(rep_msg_S)
 
     rdt.disconnect()

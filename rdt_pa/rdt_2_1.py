@@ -56,7 +56,7 @@ class Packet:
             return True
         return False
 
-class RDT:
+class RDT_2_1:
      # latest_Packet sequence number used in a packet
     seq_num = 0
     # buffer of bytes read from network
@@ -70,30 +70,6 @@ class RDT:
     def disconnect(self):
         self.network.disconnect()
 
-    def rdt_1_0_send(self, msg_S):
-        p = Packet(self.seq_num, msg_S)
-        self.seq_num += 1
-        self.network.udt_send(p.get_byte_S())
-
-    def rdt_1_0_receive(self):
-        ret_S = None
-        byte_S = self.network.udt_receive()
-        self.byte_buffer += byte_S
-        #keep extracting packets - if reordered, could get more than one
-        while True:
-            #check if we have received enough bytes
-            if(len(self.byte_buffer) < Packet.length_S_length):
-                return ret_S #not enough bytes to read packet length
-            #extract length of packet
-            length = int(self.byte_buffer[:Packet.length_S_length])
-            if len(self.byte_buffer) < length:
-                return ret_S #not enough bytes to read the whole packet
-            #create packet from buffer content and add to return string
-            p = Packet.from_byte_S(self.byte_buffer[0:length])
-            ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
-            #remove the packet bytes from the buffer
-            self.byte_buffer = self.byte_buffer[length:]
-            #if this was the last packet, will return on the next iteration
 
     # rdt2.1 has the following features:
         # delivers data under no corruption in the network
@@ -172,98 +148,6 @@ class RDT:
                     self.network.udt_send(ans_Packet.get_byte_S())
                     self.seq_num += 1
 
-                ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
-            # remove the packet bytes from the buffer
-            self.byte_buffer = self.byte_buffer[length:]
-            # if this was the last packet, will return on the next iteration
-        return ret_S
-
-    # rdt3.0 has the following features:
-        # delivers data under no corruption or loss in the network and uses a modified Packet class to send ACKs
-        # does not deliver corrupt packets and uses modified Packet class to send NAKs
-        # resends data following a NAK
-        # retransmits a lost packet after a timeout
-        # retransmits a packet after a lost ACK
-        # ignores a duplicate packet after a premature timeout (or after a lost ACK)
-
-    def rdt_3_0_send(self, msg_S):
-        p = Packet(self.seq_num, msg_S)
-        cur_seq = self.seq_num
-        while cur_seq == self.seq_num:
-            self.network.udt_send(p.get_byte_S())
-            timer = time.time()
-            resp = ''
-            # Wait for ack or nak
-            #while no response and no timeout, receive packet
-            while resp == '' and timer + self.timeout > time.time():
-                resp = self.network.udt_receive()
-
-            if resp == '':
-                continue
-
-            msg_length = int(resp[:Packet.length_S_length])
-            self.byte_buffer = resp[msg_length:]
-
-            if not Packet.corrupt(resp[:msg_length]):
-                resp_packet = Packet.from_byte_S(resp[:msg_length])
-                if resp_packet.seq_num < self.seq_num:
-                    # trying to send data again
-                    test_Packet = Packet(resp_packet.seq_num, "1")
-                    self.network.udt_send(test_Packet.get_byte_S())
-                elif resp_packet.msg_S is "1":
-                    # Sender Received ACK, move on to next packet.
-                    # Sender Incrementing seq_num)
-                    self.seq_num += 1
-                elif resp_packet.msg_S is "0":
-                    # Sender: NAK received
-                    self.byte_buffer = ''
-            else:
-                # else sender recieved Corrupted ACK"
-                self.byte_buffer = ''
-
-
-    def rdt_3_0_receive(self):
-        #ignore duplicate packets
-        #receiver specifies seq_num of ACKed packet
-        ret_S = None
-        byte_S = self.network.udt_receive()
-        self.byte_buffer += byte_S
-        cur_seq = self.seq_num
-        # Don't move on until seq_num has been updated
-        # keep extracting packets - if reordered, could get more than one
-        while cur_seq == self.seq_num:
-            # check if we have received enough bytes
-            if len(self.byte_buffer) < Packet.length_S_length:
-                break  # not enough bytes to read packet length
-            # extract length of packet
-            length = int(self.byte_buffer[:Packet.length_S_length])
-            if len(self.byte_buffer) < length:
-                break  # not enough bytes to read the whole packet
-
-            # Check if the packet is corrupt
-            if Packet.corrupt(self.byte_buffer):
-                # Send a NAK
-                # Reciever: Corrupt packet found. send a NAK
-                ans_Packet = Packet(self.seq_num, "0")
-                self.network.udt_send(ans_Packet.get_byte_S())
-            else:
-                # create packet from buffer content
-                p = Packet.from_byte_S(self.byte_buffer[0:length])
-                # Check packet to see if it as an acknowledgement packet
-                if p.is_ack_packet():
-                    self.byte_buffer = self.byte_buffer[length:]
-                    continue
-                if p.seq_num < self.seq_num:
-                    # Recierver already received this packet, ACK again.
-                    ans_Packet = Packet(p.seq_num, "1")
-                    self.network.udt_send(ans_Packet.get_byte_S())
-                elif p.seq_num == self.seq_num:
-                    # Reciever got new packet. Send ACK and increment seq_num
-                    ans_Packet = Packet(self.seq_num, "1")
-                    self.network.udt_send(ans_Packet.get_byte_S())
-                    #Reciever increments seq_num
-                    self.seq_num += 1
-                # Add contents to return string
                 ret_S = p.msg_S if (ret_S is None) else ret_S + p.msg_S
             # remove the packet bytes from the buffer
             self.byte_buffer = self.byte_buffer[length:]
