@@ -56,15 +56,10 @@ if __name__ == '__main__':
             else:
                 continue
         time_of_last_data = time.time()
-        
+
         rep_msg_S = piglatinize(msg_S)
         print('Converted %s \nto \n%s\n' % (msg_S, rep_msg_S))
-        '''
-        # convert and reply
-        rep_msg_S = piglatinize(msg_S)
-        print('Converted %s \nto \n%s\n' % (msg_S, rep_msg_S))
-        rdt.rdt_1_0_send(rep_msg_S)
+        # rdt.rdt_1_0_send(rep_msg_S)
         rdt.rdt_2_1_send(rep_msg_S)
-        rdt.rdt_3_0_send(rep_msg_S)
-        '''
+        # rdt.rdt_3_0_send(rep_msg_S)
     rdt.disconnect()
