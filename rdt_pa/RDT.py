@@ -105,7 +105,6 @@ class RDT:
             # wait for ACK or NAK
             pack_ack = self.receive_packet()
 
-
             # Break if successfully sent, otherwise retry
             corrupt = Packet.corrupt(pack_ack.get_byte_S())
             # print(pack_ack.msg_S)
