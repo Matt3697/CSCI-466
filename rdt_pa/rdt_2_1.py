@@ -1,4 +1,4 @@
-import Network
+import network_2_1
 import argparse
 import time
 from time import sleep
@@ -65,7 +65,7 @@ class RDT_2_1:
 
 
     def __init__(self, role_S, server_S, port):
-        self.network = Network.NetworkLayer(role_S, server_S, port)
+        self.network = network_2_1.NetworkLayer(role_S, server_S, port)
 
     def disconnect(self):
         self.network.disconnect()
@@ -95,14 +95,14 @@ class RDT_2_1:
                 resp_packet = Packet.from_byte_S(resp[:msg_length])
                 if resp_packet.seq_num < self.seq_num:
                     # It's trying to send data again
-                    #"SENDER: Receiver behind sender"
+                    print("Sender: Receiver behind sender")
                     test_Packet = Packet(resp_packet.seq_num, "1")
                     self.network.udt_send(test_Packet.get_byte_S())
                 elif resp_packet.msg_S is "1":
-                    #"SENDER: Received ACK, move on to next."
+                    print("Sender: Received ACK, move on to next.")
                     self.seq_num += 1
                 elif resp_packet.msg_S is "0":
-                    #"SENDER: NAK received"
+                    print("Sender: NAK received")
                     self.byte_buffer = ''
             else:
                 #"SENDER: Corrupted ACK"
@@ -127,7 +127,7 @@ class RDT_2_1:
             # Check if packet is corrupt
             if Packet.corrupt(self.byte_buffer):
                 # Send a NAK
-                #"RECEIVER: Corrupt packet, sending NAK."
+                print("RECEIVER: Corrupt packet, sending NAK.")
                 ans_Packet = Packet(self.seq_num, "0")
                 self.network.udt_send(ans_Packet.get_byte_S())
             else:
@@ -137,12 +137,12 @@ class RDT_2_1:
                     self.byte_buffer = self.byte_buffer[length:]
                     continue
                 if p.seq_num < self.seq_num:
-                    #'RECEIVER: Already received packet.  ACK again.'
+                    print("Reciever: Already received packet.  ACK again.")
                     # Send another ACK
                     ans_Packet = Packet(p.seq_num, "1")
                     self.network.udt_send(ans_Packet.get_byte_S())
                 elif p.seq_num == self.seq_num:
-                    #'RECEIVER: Received new packet, Send ACK and increment seq.'
+                    print("Reciever: Received new packet, Send ACK and increment seq.")
                     # SEND ACK
                     ans_Packet = Packet(self.seq_num, "1")
                     self.network.udt_send(ans_Packet.get_byte_S())
